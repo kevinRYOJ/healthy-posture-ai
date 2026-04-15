@@ -2,44 +2,44 @@ name: CI HealthyPosture
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: 20
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-    # Install backend
-    - name: Install Backend
-      run: |
-        cd backend
-        npm install
+      # Install backend
+      - name: Install Backend
+        run: |
+          cd server
+          npm install
 
-    # Install frontend
-    - name: Install Frontend
-      run: |
-        cd frontend
-        npm install
+      # Install frontend
+      - name: Install Frontend
+        run: |
+          cd client
+          npm install
 
-    # Build frontend (Vite)
-    - name: Build Frontend
-      run: |
-        cd frontend
-        npm run build
+      # Build frontend (Vite)
+      - name: Build Frontend
+        run: |
+          cd client
+          npm run build
 
-    # Test backend (simple run)
-    - name: Test Backend
-      run: |
-        cd backend
-        node app.js &
-        sleep 5
+      # Test backend (simple run)
+      - name: Test Backend
+        run: |
+          cd server
+          node app.js &
+          sleep 5
