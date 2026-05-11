@@ -17,7 +17,7 @@ export default function Dashboard() {
   const now = new Date();
   const greeting =
     now.getHours() < 12 ? 'Selamat Pagi' :
-    now.getHours() < 17 ? 'Selamat Siang' : 'Selamat Sore';
+      now.getHours() < 17 ? 'Selamat Siang' : 'Selamat Sore';
 
   return (
     <main className="dashboard container">
@@ -30,7 +30,7 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="dashboard__tip">
-          💡 <em>Duduk tegak, layar sejajar mata, kaki rata di lantai.</em>
+          <em>Duduk tegak, layar sejajar mata, kaki rata di lantai.</em>
         </div>
       </div>
 
