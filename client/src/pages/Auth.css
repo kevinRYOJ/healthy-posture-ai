@@ -1,0 +1,158 @@
+.auth-page {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-lg);
+  background: radial-gradient(ellipse at 60% 0%, #CCFBF1 0%, var(--clr-bg) 60%);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-2xl);
+}
+
+/* Branding */
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--clr-primary);
+  margin-bottom: var(--space-sm);
+}
+.auth-brand__icon { font-size: 1.4rem; }
+
+/* Titles */
+.auth-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--clr-text);
+  margin-top: -var(--space-sm);
+}
+.auth-sub {
+  font-size: 0.88rem;
+  color: var(--clr-text-secondary);
+  margin-top: -0.5rem;
+}
+
+/* Error */
+.auth-error {
+  background: #FEE2E2;
+  border: 1px solid #FECACA;
+  border-radius: var(--radius-md);
+  color: var(--clr-danger);
+  font-size: 0.875rem;
+  padding: 0.65rem 1rem;
+  animation: fadeIn 0.25s ease;
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.auth-field label {
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: var(--clr-text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auth-field input {
+  padding: 0.72rem 1rem;
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-family: var(--font-body);
+  color: var(--clr-text);
+  background: var(--clr-bg);
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.auth-field input:focus {
+  border-color: var(--clr-primary-light);
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.15);
+}
+
+/* Password strength */
+.pw-strength {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.1rem 0.5rem;
+  border-radius: var(--radius-full);
+}
+.pw-strength--weak   { background: #FEE2E2; color: var(--clr-danger); }
+.pw-strength--medium { background: #FEF9C3; color: #A16207; }
+.pw-strength--strong { background: #DCFCE7; color: #15803D; }
+
+.pw-bar {
+  height: 4px;
+  background: var(--clr-bg-2);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.pw-bar__fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.pw-bar__fill--weak   { width: 33%; background: var(--clr-danger); }
+.pw-bar__fill--medium { width: 66%; background: var(--clr-warning); }
+.pw-bar__fill--strong { width: 100%; background: var(--clr-success); }
+
+/* Submit */
+.auth-submit {
+  width: 100%;
+  justify-content: center;
+  padding: 0.85rem;
+  font-size: 1rem;
+  margin-top: var(--space-sm);
+  gap: var(--space-sm);
+}
+
+.auth-spinner {
+  width: 18px; height: 18px;
+  border: 2.5px solid rgba(255,255,255,0.4);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Switch link */
+.auth-switch {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--clr-text-secondary);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--clr-border);
+}
+
+.auth-link {
+  color: var(--clr-primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.auth-link:hover { color: var(--clr-primary-dark); }
