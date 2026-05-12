@@ -4,7 +4,7 @@ import { useApp } from '../context/AppContext';
 import './Timer.css';
 
 // Setiap 45 menit duduk → tampilkan peringatan
-const BREAK_REMINDER_MINUTES = 45;
+const BREAK_REMINDER_MINUTES = 4;
 
 export default function Timer() {
   const { addSession, fetchRisk, totalSittingToday } = useApp();

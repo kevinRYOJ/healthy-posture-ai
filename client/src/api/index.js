@@ -1,10 +1,9 @@
 // API — semua network call ke backend Express
 
-
-const BASE_AUTH    = '/api/auth';
+const BASE_AUTH = '/api/auth';
 const BASE_PREDICT = '/predict';
+const BASE_SESSIONS = '/api/sessions';
 
-// ── Helper: tambah Authorization header jika ada token ──────
 function authHeaders() {
   const token = localStorage.getItem('hpr_token');
   return {
@@ -14,14 +13,12 @@ function authHeaders() {
 }
 
 async function handleRes(res) {
-  const data = await res.json();
+  const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.message || 'Request gagal');
   return data;
 }
 
 // ── Auth ─────────────────────────────────────────────────────
-
-/** POST /api/auth/register  →  { token, user } */
 export async function register(name, email, password) {
   const res = await fetch(`${BASE_AUTH}/register`, {
     method: 'POST',
@@ -31,7 +28,6 @@ export async function register(name, email, password) {
   return handleRes(res);
 }
 
-/** POST /api/auth/login  →  { token, user } */
 export async function login(email, password) {
   const res = await fetch(`${BASE_AUTH}/login`, {
     method: 'POST',
@@ -41,13 +37,11 @@ export async function login(email, password) {
   return handleRes(res);
 }
 
-/** GET /api/auth/me  →  { user }  (butuh token) */
 export async function getMe() {
   const res = await fetch(`${BASE_AUTH}/me`, { headers: authHeaders() });
   return handleRes(res);
 }
 
-/** PUT /api/auth/profile  →  { user }  (butuh token) */
 export async function updateProfile(name) {
   const res = await fetch(`${BASE_AUTH}/profile`, {
     method: 'PUT',
@@ -57,9 +51,33 @@ export async function updateProfile(name) {
   return handleRes(res);
 }
 
-// ── Prediction ───────────────────────────────────────────────
+// ── Sessions ─────────────────────────────────────────────────
+export async function getSessions() {
+  const res = await fetch(BASE_SESSIONS, {
+    method: 'GET',
+    headers: authHeaders(),
+  });
+  return handleRes(res);
+}
 
-/** POST /predict  →  { risk: 'Low'|'Medium'|'High' } */
+export async function createSession(session) {
+  const res = await fetch(BASE_SESSIONS, {
+    method: 'POST',
+    headers: authHeaders(),
+    body: JSON.stringify(session),
+  });
+  return handleRes(res);
+}
+
+export async function deleteAllSessions() {
+  const res = await fetch(BASE_SESSIONS, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  return handleRes(res);
+}
+
+// ── Prediction ───────────────────────────────────────────────
 export async function predictRisk(totalSittingMinutes) {
   const res = await fetch(BASE_PREDICT, {
     method: 'POST',
@@ -69,10 +87,11 @@ export async function predictRisk(totalSittingMinutes) {
   return handleRes(res);
 }
 
-/** Cek apakah backend aktif */
 export async function checkHealth() {
   try {
-    const res = await fetch('/api/');
+    const res = await fetch('/api/health');
     return res.ok;
-  } catch { return false; }
+  } catch {
+    return false;
+  }
 }
