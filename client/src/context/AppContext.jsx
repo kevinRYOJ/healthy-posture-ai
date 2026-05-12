@@ -1,58 +1,97 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { predictRisk } from '../api';
+import {
+  predictRisk,
+  getSessions as apiGetSessions,
+  createSession as apiCreateSession,
+  deleteAllSessions as apiDeleteAllSessions,
+} from '../api';
 
 const AppContext = createContext(null);
 
-// Baca/simpan ke localStorage
-const LS_KEY = 'hpr_sessions';
-const loadSessions = () => {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
-};
-const saveSessions = (s) => localStorage.setItem(LS_KEY, JSON.stringify(s));
+function toNumber(value, fallback = 0) {
+  const n = Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
 
-// Hitung health score (0–100) dari sesi hari ini
-// Rumus: poin per jeda diambil tepat waktu, dikurangi overtime
+function normalizeSession(raw) {
+  if (!raw) return null;
+
+  const start = raw.start ?? raw.start_time ?? raw.started_at ?? null;
+  const end = raw.end ?? raw.end_time ?? raw.finished_at ?? null;
+
+  return {
+    id: raw.id ?? raw.session_id ?? Date.now(),
+    start,
+    end,
+    duration: toNumber(raw.duration, 0),
+    totalBreakTime: toNumber(raw.totalBreakTime ?? raw.total_break_time, 0),
+    breaksTaken: toNumber(raw.breaksTaken ?? raw.breaks_taken, 0),
+  };
+}
+
+function isValidDate(value) {
+  return value && !Number.isNaN(new Date(value).getTime());
+}
+
 function calcHealthScore(sessions) {
   const today = new Date().toDateString();
   const todaySessions = sessions.filter(
-    (s) => new Date(s.start).toDateString() === today
+    (s) => isValidDate(s.start) && new Date(s.start).toDateString() === today
   );
   if (todaySessions.length === 0) return 100;
 
   let score = 100;
   for (const s of todaySessions) {
-    const durationMin = s.duration / 60;
-    if (durationMin > 60) score -= 10;      // duduk > 1 jam tanpa jeda
+    const durationMin = toNumber(s.duration) / 60;
+    if (durationMin > 60) score -= 10;
     if (durationMin > 90) score -= 15;
-    if (s.breaksTaken === 0 && durationMin > 30) score -= 5;
-    if (s.breaksTaken > 0) score += 3;
+    if (toNumber(s.breaksTaken) === 0 && durationMin > 30) score -= 5;
+    if (toNumber(s.breaksTaken) > 0) score += 3;
   }
   return Math.max(0, Math.min(100, Math.round(score)));
 }
 
-// Total duduk hari ini (menit)
 function calcTodaySitting(sessions) {
   const today = new Date().toDateString();
   return sessions
-    .filter((s) => new Date(s.start).toDateString() === today)
-    .reduce((acc, s) => acc + Math.round(s.duration / 60), 0);
+    .filter((s) => isValidDate(s.start) && new Date(s.start).toDateString() === today)
+    .reduce((acc, s) => acc + Math.round(toNumber(s.duration) / 60), 0);
 }
 
 export function AppProvider({ children }) {
-  const [sessions, setSessions] = useState(loadSessions);
-  const [riskLevel, setRiskLevel] = useState(null);   // 'Low'|'Medium'|'High'
+  const [sessions, setSessions] = useState([]);
+  const [riskLevel, setRiskLevel] = useState(null);
   const [riskLoading, setRiskLoading] = useState(false);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
 
   const healthScore = calcHealthScore(sessions);
   const totalSittingToday = calcTodaySitting(sessions);
 
-  // Simpan ke localStorage setiap kali sessions berubah
-  useEffect(() => { saveSessions(sessions); }, [sessions]);
+  const loadSessions = useCallback(async () => {
+    if (!localStorage.getItem('hpr_token')) {
+      setSessions([]);
+      return;
+    }
 
-  // Ambil prediksi risk dari backend
+    setSessionsLoading(true);
+    try {
+      const data = await apiGetSessions();
+      const normalized = (data.sessions || [])
+        .map(normalizeSession)
+        .filter(Boolean);
+      setSessions(normalized);
+    } catch (err) {
+      console.warn('Gagal mengambil sessions:', err.message);
+      setSessions([]);
+    } finally {
+      setSessionsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadSessions();
+  }, [loadSessions]);
+
   const fetchRisk = useCallback(async (minutes) => {
     setRiskLoading(true);
     try {
@@ -66,17 +105,48 @@ export function AppProvider({ children }) {
     }
   }, []);
 
-  // Tambah sesi baru setelah timer selesai
-  const addSession = useCallback((session) => {
-    setSessions((prev) => {
-      const updated = [session, ...prev].slice(0, 100); // max 100 sesi
-      return updated;
-    });
-    fetchRisk(totalSittingToday + Math.round(session.duration / 60));
-  }, [fetchRisk, totalSittingToday]);
+  const addSession = useCallback(async (session) => {
+    try {
+      const token = localStorage.getItem('hpr_token');
 
-  // Hapus semua sesi (reset)
-  const clearSessions = useCallback(() => {
+      const payload = {
+        startTime: session.startTime || session.start,
+        endTime: session.endTime || session.end || new Date().toISOString(),
+        duration: session.duration || 0,
+        breaksTaken: session.breaksTaken || 0,
+        totalBreakTime: session.totalBreakTime || 0,
+      };
+
+      console.log('KIRIM SESSION:', payload);
+
+      const res = await fetch('/api/sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Gagal menyimpan session');
+      }
+
+      const normalized = normalizeSession(data.session);
+      setSessions((prev) => [normalized, ...prev]);
+    } catch (error) {
+      console.error('Gagal menyimpan session ke server:', error.message);
+    }
+  }, []);
+
+  const clearSessions = useCallback(async () => {
+    try {
+      await apiDeleteAllSessions();
+    } catch (err) {
+      console.warn('Gagal hapus sessions di server:', err.message);
+    }
     setSessions([]);
     setRiskLevel(null);
   }, []);
@@ -91,6 +161,8 @@ export function AppProvider({ children }) {
       riskLevel,
       riskLoading,
       fetchRisk,
+      sessionsLoading,
+      reloadSessions: loadSessions,
     }}>
       {children}
     </AppContext.Provider>
