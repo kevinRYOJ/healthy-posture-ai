@@ -16,16 +16,35 @@ function toNumber(value, fallback = 0) {
 function normalizeSession(raw) {
   if (!raw) return null;
 
-  const start = raw.start ?? raw.start_time ?? raw.started_at ?? null;
-  const end = raw.end ?? raw.end_time ?? raw.finished_at ?? null;
+  const start =
+    raw.start ??
+    raw.startTime ??
+    raw.start_time ??
+    raw.started_at ??
+    null;
+
+  const end =
+    raw.end ??
+    raw.endTime ??
+    raw.end_time ??
+    raw.finished_at ??
+    null;
 
   return {
     id: raw.id ?? raw.session_id ?? Date.now(),
     start,
     end,
     duration: toNumber(raw.duration, 0),
-    totalBreakTime: toNumber(raw.totalBreakTime ?? raw.total_break_time, 0),
-    breaksTaken: toNumber(raw.breaksTaken ?? raw.breaks_taken, 0),
+    totalBreakTime: toNumber(
+      raw.totalBreakTime ??
+      raw.total_break_time,
+      0
+    ),
+    breaksTaken: toNumber(
+      raw.breaksTaken ??
+      raw.breaks_taken,
+      0
+    ),
   };
 }
 
@@ -36,7 +55,7 @@ function isValidDate(value) {
 function calcHealthScore(sessions) {
   const today = new Date().toDateString();
   const todaySessions = sessions.filter(
-    (s) => isValidDate(s.start) && new Date(s.start).toDateString() === today
+    (s) => s && isValidDate(s.start) && new Date(s.start).toDateString() === today
   );
   if (todaySessions.length === 0) return 100;
 
@@ -54,7 +73,7 @@ function calcHealthScore(sessions) {
 function calcTodaySitting(sessions) {
   const today = new Date().toDateString();
   return sessions
-    .filter((s) => isValidDate(s.start) && new Date(s.start).toDateString() === today)
+    .filter((s) => s && isValidDate(s.start) && new Date(s.start).toDateString() === today)
     .reduce((acc, s) => acc + Math.round(toNumber(s.duration) / 60), 0);
 }
 
