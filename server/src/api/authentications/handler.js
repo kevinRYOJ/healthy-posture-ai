@@ -53,6 +53,7 @@ class AuthenticationsHandler {
                 TokenManager.generateAccessToken({
                     id: user.id,
                     email: user.email,
+                    name: user.name,
                 });
 
             return res.status(200).json({
@@ -63,6 +64,7 @@ class AuthenticationsHandler {
                     id: user.id,
                     name: user.name,
                     email: user.email,
+
                 },
             });
 

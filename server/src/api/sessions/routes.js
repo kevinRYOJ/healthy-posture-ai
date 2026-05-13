@@ -1,11 +1,26 @@
 const express = require('express');
+const auth = require('../../middlewares/auth');
 
 const routes = (handler) => {
     const router = express.Router();
 
-    router.get('/', handler.getSessionsHandler);
-    router.post('/', handler.postSessionHandler);
-    router.delete('/', handler.deleteSessionsHandler);
+    router.get(
+        '/',
+        auth,
+        handler.getSessionsHandler
+    );
+
+    router.post(
+        '/',
+        auth,
+        handler.postSessionHandler
+    );
+
+    router.delete(
+        '/',
+        auth,
+        handler.deleteSessionsHandler
+    );
 
     return router;
 };
