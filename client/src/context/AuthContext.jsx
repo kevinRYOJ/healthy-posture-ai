@@ -6,7 +6,7 @@ const AuthContext = createContext(null);
 const TOKEN_KEY = 'hpr_token';
 
 export function AuthProvider({ children }) {
-  const [user, setUser]       = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true); // cek token saat pertama load
 
   // Saat app pertama dibuka — restore session dari token tersimpan
@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
     if (!token) { setLoading(false); return; }
 
     getMe()
-      .then(({ user }) => setUser(user))
+      .then((res) => setUser(res.data.user))
       .catch(() => localStorage.removeItem(TOKEN_KEY))
       .finally(() => setLoading(false));
   }, []);
@@ -29,8 +29,8 @@ export function AuthProvider({ children }) {
   }, []);
 
   /** Register: langsung login setelah berhasil */
-  const register = useCallback(async (name, email, password) => {
-    const data = await apiRegister(name, email, password);
+  const register = useCallback(async (name, email, password, confirmPassword) => {
+    const data = await apiRegister(name, email, password, confirmPassword);
     localStorage.setItem(TOKEN_KEY, data.token);
     setUser(data.user);
     return data.user;

@@ -1,8 +1,9 @@
 // API — semua network call ke backend Express
 
-const BASE_AUTH = '/api/auth';
-const BASE_PREDICT = '/predict';
-const BASE_SESSIONS = '/api/sessions';
+const BASE_URL = 'http://localhost:5000';
+const BASE_AUTH = `${BASE_URL}/api/auth`;
+const BASE_PREDICT = `${BASE_URL}/predict`;
+const BASE_SESSIONS = `${BASE_URL}/api/sessions`;
 
 function authHeaders() {
   const token = localStorage.getItem('hpr_token');
@@ -19,11 +20,11 @@ async function handleRes(res) {
 }
 
 // ── Auth ─────────────────────────────────────────────────────
-export async function register(name, email, password) {
+export async function register(name, email, password, confirmPassword) {
   const res = await fetch(`${BASE_AUTH}/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, email, password }),
+    body: JSON.stringify({ name, email, password, confirmPassword }),
   });
   return handleRes(res);
 }
@@ -89,7 +90,7 @@ export async function predictRisk(totalSittingMinutes) {
 
 export async function checkHealth() {
   try {
-    const res = await fetch('/api/health');
+    const res = await fetch(`${BASE_URL}/api/health`);
     return res.ok;
   } catch {
     return false;

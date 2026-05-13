@@ -5,10 +5,10 @@ import './Auth.css';
 
 export default function Register() {
   const { register } = useAuth();
-  const navigate     = useNavigate();
+  const navigate = useNavigate();
 
-  const [form,    setForm]    = useState({ name: '', email: '', password: '', confirm: '' });
-  const [error,   setError]   = useState('');
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) =>
@@ -18,14 +18,14 @@ export default function Register() {
     e.preventDefault();
     setError('');
 
-    if (form.password !== form.confirm) {
+    if (form.password !== form.confirmPassword) {
       setError('Password dan konfirmasi tidak cocok');
       return;
     }
 
     setLoading(true);
     try {
-      await register(form.name, form.email, form.password);
+      await register(form.name, form.email, form.password, form.confirmPassword);
       navigate('/dashboard', { replace: true });
     } catch (err) {
       setError(err.message);
@@ -37,8 +37,8 @@ export default function Register() {
   // Indikator kekuatan password
   const strength =
     form.password.length === 0 ? null :
-    form.password.length < 6   ? 'weak' :
-    form.password.length < 10  ? 'medium' : 'strong';
+      form.password.length < 6 ? 'weak' :
+        form.password.length < 10 ? 'medium' : 'strong';
 
   return (
     <main className="auth-page">
@@ -107,16 +107,17 @@ export default function Register() {
           </div>
 
           <div className="auth-field">
-            <label htmlFor="confirm">Konfirmasi Password</label>
+            <label htmlFor="confirmPassword">Konfirmasi Password</label>
             <input
-              id="confirm"
-              name="confirm"
+              id="confirmPassword"
+              name="confirmPassword"
               type="password"
               placeholder="Ulangi password"
-              value={form.confirm}
+              value={form.confirmPassword}
               onChange={handleChange}
               required
             />
+
           </div>
 
           <button
