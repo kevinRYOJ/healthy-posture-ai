@@ -12,23 +12,8 @@ export default function ProtectedRoute({ children }) {
 
   if (loading) {
     return (
-      <div style={{
-        minHeight: '60vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'column',
-        gap: '1rem',
-        color: 'var(--clr-text-secondary)',
-        fontFamily: 'var(--font-heading)',
-      }}>
-        <div style={{
-          width: 40, height: 40,
-          border: '4px solid var(--clr-bg-2)',
-          borderTopColor: 'var(--clr-primary)',
-          borderRadius: '50%',
-          animation: 'spin 0.8s linear infinite',
-        }} />
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 text-text-secondary font-heading">
+        <div className="w-10 h-10 border-4 border-bg-2 border-t-primary rounded-full animate-spin" />
         <span>Memuat sesi...</span>
       </div>
     );
@@ -37,6 +22,10 @@ export default function ProtectedRoute({ children }) {
   if (!user) {
     // simpan URL tujuan agar bisa redirect balik setelah login
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (!user.has_personalized && location.pathname !== '/setup') {
+    return <Navigate to="/setup" replace />;
   }
 
   return children;

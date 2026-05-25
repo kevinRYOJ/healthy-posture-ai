@@ -28,12 +28,15 @@ export function AuthProvider({ children }) {
     return data.user;
   }, []);
 
-  /** Register: langsung login setelah berhasil */
+  /** Register: setelah register, auto-login karena register tidak return token */
   const register = useCallback(async (name, email, password, confirmPassword) => {
-    const data = await apiRegister(name, email, password, confirmPassword);
-    localStorage.setItem(TOKEN_KEY, data.token);
-    setUser(data.user);
-    return data.user;
+    await apiRegister(name, email, password, confirmPassword);
+    // Register berhasil tapi tidak return token,
+    // jadi kita login otomatis untuk mendapat token
+    const loginData = await apiLogin(email, password);
+    localStorage.setItem(TOKEN_KEY, loginData.token);
+    setUser(loginData.user);
+    return loginData.user;
   }, []);
 
   /** Logout: hapus token + reset state */
