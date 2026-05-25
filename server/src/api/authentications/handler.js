@@ -64,7 +64,7 @@ class AuthenticationsHandler {
                     id: user.id,
                     name: user.name,
                     email: user.email,
-
+                    has_personalized: user.has_personalized,
                 },
             });
 

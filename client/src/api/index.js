@@ -52,6 +52,15 @@ export async function updateProfile(name) {
   return handleRes(res);
 }
 
+export async function savePersonalization(data) {
+  const res = await fetch(`${BASE_AUTH}/profile`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  return handleRes(res);
+}
+
 // ── Sessions ─────────────────────────────────────────────────
 export async function getSessions() {
   const res = await fetch(BASE_SESSIONS, {
@@ -82,7 +91,7 @@ export async function deleteAllSessions() {
 export async function predictRisk(totalSittingMinutes) {
   const res = await fetch(BASE_PREDICT, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({ total_sitting: totalSittingMinutes }),
   });
   return handleRes(res);

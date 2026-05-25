@@ -1,17 +1,14 @@
 import { useApp } from '../context/AppContext';
-import './StatsCard.css';
 
-function StatItem({ icon, label, value, sub, color }) {
+function StatItem({ label, value, sub, color }) {
   return (
-    <div className="stat-item" style={{ '--accent': color }}>
-      <div className="stat-item__icon">{icon}</div>
-
-      <div className="stat-item__body">
-        <div className="stat-item__value">{value}</div>
-        <div className="stat-item__label">{label}</div>
+    <div className="relative flex items-center gap-4 p-4 bg-bg rounded-md border border-border transition-transform hover:-translate-y-0.5 hover:shadow-md">
+      <div className="flex flex-col">
+        <div className="font-heading text-[1.4rem] font-bold leading-tight" style={{ color: color }}>{value}</div>
+        <div className="text-[0.78rem] font-semibold text-text uppercase tracking-wide">{label}</div>
 
         {sub && (
-          <div className="stat-item__sub">
+          <div className="text-[0.72rem] text-text-secondary mt-px">
             {sub}
           </div>
         )}
@@ -64,30 +61,27 @@ export default function StatsCard() {
         : 'Baik';
 
   return (
-    <div className="stats-wrap card">
-      <h2 className="stats-title">
+    <div className="bg-white rounded-lg p-8 shadow-md border border-border flex flex-col gap-4">
+      <h2 className="text-[1.25rem] text-primary font-heading font-bold">
         Ringkasan Hari Ini
       </h2>
 
-      <div className="stats-grid">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <StatItem
-          icon="🪑"
           label="Total Duduk"
           value={`${sitting} mnt`}
           sub={sittingStatus}
-          color="var(--clr-primary)"
+          color="var(--color-primary)"
         />
 
         <StatItem
-          icon="☕"
           label="Jeda Diambil"
           value={totalBreaks}
           sub={`dari ${todaySessions.length} sesi`}
-          color="var(--clr-accent)"
+          color="var(--color-accent)"
         />
 
         <StatItem
-          icon="⏱️"
           label="Terlama Duduk"
           value={`${longestSitting} mnt`}
           sub={
@@ -95,7 +89,7 @@ export default function StatsCard() {
               ? '⚠️ terlalu lama'
               : '✅ oke'
           }
-          color="var(--clr-warning)"
+          color="var(--color-warning)"
         />
 
         <StatItem
@@ -103,7 +97,7 @@ export default function StatsCard() {
           label="Health Score"
           value={healthScore}
           sub="/ 100"
-          color="var(--clr-success)"
+          color="var(--color-success)"
         />
       </div>
     </div>

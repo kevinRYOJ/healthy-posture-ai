@@ -6,17 +6,18 @@ class SessionsService {
         this._pool = pool;
     }
 
-    async getSessions() {
+    async getSessions(userId) {
         const query = {
             text: `
         SELECT *
         FROM sitting_sessions
+        WHERE user_id = $1
         ORDER BY "startTime" DESC
       `,
+            values: [userId],
         };
 
-        const result =
-            await this._pool.query(query);
+        const result = await this._pool.query(query);
 
         return result.rows;
     }

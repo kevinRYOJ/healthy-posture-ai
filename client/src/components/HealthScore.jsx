@@ -1,11 +1,10 @@
 import { useApp } from '../context/AppContext';
-import './HealthScore.css';
 
 const LEVELS = [
-  { min: 80, label: 'Champion', emoji: '🏆', color: '#22C55E' },
-  { min: 60, label: 'Aktif',    emoji: '💪', color: '#14B8A6' },
-  { min: 40, label: 'Berkembang', emoji: '🌱', color: '#EAB308' },
-  { min: 0,  label: 'Pemula',   emoji: '🐢', color: '#EF4444' },
+  { min: 80, label: 'Champion', color: '#22C55E' },
+  { min: 60, label: 'Aktif',    color: '#14B8A6' },
+  { min: 40, label: 'Berkembang', color: '#EAB308' },
+  { min: 0,  label: 'Pemula',   color: '#EF4444' },
 ];
 
 function getLevel(score) {
@@ -21,14 +20,14 @@ export default function HealthScore() {
   const offset = circ * (1 - healthScore / 100);
 
   return (
-    <div className="hs-card card">
-      <h2 className="hs-card__title">Health Score</h2>
-      <p className="hs-card__sub">Skor postur hari ini</p>
+    <div className="bg-white rounded-lg p-8 shadow-md border border-border flex flex-col gap-4">
+      <h2 className="text-[1.25rem] text-primary font-heading font-bold">Health Score</h2>
+      <p className="text-[0.85rem] text-text-secondary -mt-2">Skor postur hari ini</p>
 
-      <div className="hs-ring-wrap">
-        <svg viewBox="0 0 180 180" className="hs-ring">
+      <div className="relative w-[180px] h-[180px] mx-auto">
+        <svg viewBox="0 0 180 180" className="w-full h-full">
           {/* Track */}
-          <circle cx="90" cy="90" r={r} fill="none" stroke="var(--clr-bg-2)" strokeWidth="14" />
+          <circle cx="90" cy="90" r={r} fill="none" stroke="var(--color-bg-2)" strokeWidth="14" />
           {/* Progress */}
           <circle
             cx="90" cy="90" r={r}
@@ -42,26 +41,28 @@ export default function HealthScore() {
             style={{ transition: 'stroke-dashoffset 0.8s ease, stroke 0.4s ease' }}
           />
         </svg>
-        <div className="hs-ring__center">
-          <span className="hs-ring__emoji">{level.emoji}</span>
-          <span className="hs-ring__score" style={{ color: level.color }}>{healthScore}</span>
-          <span className="hs-ring__max">/100</span>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="font-heading text-[2.5rem] font-extrabold leading-none tracking-tight" style={{ color: level.color }}>{healthScore}</span>
+          <span className="text-[0.8rem] text-text-secondary mt-1">/100</span>
         </div>
       </div>
 
-      <div className="hs-level" style={{ background: level.color + '18', color: level.color }}>
-        {level.emoji} Level: <strong>{level.label}</strong>
+      <div className="text-center px-4 py-2 rounded-full text-[0.9rem] font-medium" style={{ background: level.color + '18', color: level.color }}>
+        Level: <strong>{level.label}</strong>
       </div>
 
       {/* Level legend */}
-      <div className="hs-legend">
-        {LEVELS.map((l) => (
-          <div key={l.label} className={`hs-legend-item ${healthScore >= l.min ? 'active' : ''}`}>
-            <span style={{ color: l.color }}>{l.emoji}</span>
-            <span>{l.label}</span>
-            <span className="hs-legend-min">{l.min}+</span>
-          </div>
-        ))}
+      <div className="grid grid-cols-2 gap-[0.4rem] mt-1">
+        {LEVELS.map((l) => {
+          const isActive = level.label === l.label;
+          return (
+            <div key={l.label} className={`flex items-center gap-[0.35rem] text-[0.78rem] px-2 py-[0.3rem] rounded-sm transition-all ${isActive ? 'text-text bg-bg-2 font-semibold ring-1 ring-primary-light/50' : 'text-text-secondary'}`}>
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: l.color, opacity: isActive ? 1 : 0.6 }} />
+              <span>{l.label}</span>
+              <span className="ml-auto text-[0.72rem] text-text-secondary opacity-70">{l.min}+</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

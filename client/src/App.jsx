@@ -9,6 +9,7 @@ import History             from './pages/History';
 import Profile             from './pages/Profile';
 import Login               from './pages/Login';
 import Register            from './pages/Register';
+import PersonalizationSetup from './pages/PersonalizationSetup';
 import './index.css';
 
 export default function App() {
@@ -24,6 +25,9 @@ export default function App() {
             <Route path="/register" element={<Register />} />
 
             {/* Protected — butuh login */}
+            <Route path="/setup" element={
+              <ProtectedRoute><PersonalizationSetup /></ProtectedRoute>
+            } />
             <Route path="/dashboard" element={
               <ProtectedRoute><Dashboard /></ProtectedRoute>
             } />

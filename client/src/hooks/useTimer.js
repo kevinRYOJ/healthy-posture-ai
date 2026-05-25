@@ -16,13 +16,15 @@ import { useState, useEffect, useRef, useCallback } from 'react';
  */
 export function useTimer() {
   const [status, setStatus] = useState('IDLE');          // IDLE | SITTING | BREAK | FINISHED
-  const [elapsedSitting, setElapsedSitting] = useState(0);  // detik
+  const [elapsedSitting, setElapsedSitting] = useState(0);  // detik (akumulasi)
+  const [continuousSitting, setContinuousSitting] = useState(0); // detik tanpa jeda
   const [elapsedBreak, setElapsedBreak]   = useState(0);    // detik jeda saat ini
   const [totalBreakTime, setTotalBreakTime] = useState(0);  // total detik jeda
   const [breaksTaken, setBreaksTaken]     = useState(0);
 
   const intervalRef = useRef(null);
-  const startTimeRef = useRef(null);   // kapan mulai duduk
+  const startTimeRef = useRef(null);   // kapan mulai duduk (akumulasi)
+  const continuousStartRef = useRef(null); // kapan mulai duduk (tanpa jeda)
   const breakStartRef = useRef(null);  // kapan mulai jeda
 
   const clearTick = () => {
@@ -32,10 +34,12 @@ export function useTimer() {
   // Mulai duduk
   const startSitting = useCallback(() => {
     startTimeRef.current = Date.now() - elapsedSitting * 1000;
+    continuousStartRef.current = Date.now();
     setStatus('SITTING');
     clearTick();
     intervalRef.current = setInterval(() => {
       setElapsedSitting(Math.round((Date.now() - startTimeRef.current) / 1000));
+      setContinuousSitting(Math.round((Date.now() - continuousStartRef.current) / 1000));
     }, 1000);
   }, [elapsedSitting]);
 
@@ -45,6 +49,7 @@ export function useTimer() {
     breakStartRef.current = Date.now();
     setStatus('BREAK');
     setElapsedBreak(0);
+    setContinuousSitting(0);
     intervalRef.current = setInterval(() => {
       setElapsedBreak(Math.round((Date.now() - breakStartRef.current) / 1000));
     }, 1000);
@@ -56,11 +61,16 @@ export function useTimer() {
     setTotalBreakTime((prev) => prev + breakDuration);
     setBreaksTaken((prev) => prev + 1);
     setElapsedBreak(0);
+    setContinuousSitting(0);
+    
     startTimeRef.current = Date.now() - elapsedSitting * 1000;
+    continuousStartRef.current = Date.now();
+    
     setStatus('SITTING');
     clearTick();
     intervalRef.current = setInterval(() => {
       setElapsedSitting(Math.round((Date.now() - startTimeRef.current) / 1000));
+      setContinuousSitting(Math.round((Date.now() - continuousStartRef.current) / 1000));
     }, 1000);
   }, [elapsedSitting]);
 
@@ -97,6 +107,7 @@ export function useTimer() {
   return {
     status,
     elapsedSitting,
+    continuousSitting,
     elapsedBreak,
     breaksTaken,
     totalBreakTime,

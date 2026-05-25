@@ -14,8 +14,8 @@ class SessionsHandler {
 
     async getSessionsHandler(req, res) {
         try {
-            const sessions =
-                await this._service.getSessions();
+            const userId = req.user.id;
+            const sessions = await this._service.getSessions(userId);
 
             return res.json({
                 status: 'success',

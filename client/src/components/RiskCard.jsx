@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import './RiskCard.css';
 
 const RISK_INFO = {
   Low: {
@@ -11,7 +10,7 @@ const RISK_INFO = {
     emoji: '⚠️', label: 'Sedang', color: '#A16207', bg: '#FEF9C3', border: '#FDE047',
     desc: 'Perhatikan durasi dudukmu. Pastikan mengambil jeda setiap 45 menit.',
   },
-  High: {
+  Tinggi: {
     emoji: '🔴', label: 'Tinggi', color: '#DC2626', bg: '#FEE2E2', border: '#FCA5A5',
     desc: 'Risiko postur buruk tinggi! Segera istirahat dan lakukan peregangan.',
   },
@@ -20,7 +19,7 @@ const RISK_INFO = {
 const TIPS = {
   Low:    ['Lakukan peregangan ringan tiap jam', 'Pastikan monitor sejajar mata', 'Minum air setiap 30 menit'],
   Medium: ['Istirahat 5 menit tiap 45 menit', 'Cek posisi punggung & leher', 'Pertimbangkan standing desk'],
-  High:   ['Istirahat SEKARANG minimal 15 menit', 'Lakukan peregangan punggung & leher', 'Batasi duduk max 1 jam tanpa jeda'],
+  Tinggi:   ['Istirahat SEKARANG minimal 15 menit', 'Lakukan peregangan punggung & leher', 'Batasi duduk max 1 jam tanpa jeda'],
 };
 
 export default function RiskCard() {
@@ -36,57 +35,57 @@ export default function RiskCard() {
   };
 
   return (
-    <div className="risk-card card">
-      <div className="risk-card__header">
-        <h2 className="risk-card__title">Prediksi Risiko AI</h2>
-        <span className="risk-card__badge-api">🤖 /predict</span>
+    <div className="bg-white rounded-lg p-8 shadow-md border border-border flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-[1.25rem] text-primary font-heading font-bold">Prediksi Risiko AI</h2>
+        <span className="text-[0.72rem] font-mono bg-primary text-white px-2 py-[0.2rem] rounded-sm">🤖 /predict</span>
       </div>
-      <p className="risk-card__sub">
+      <p className="text-[0.84rem] text-text-secondary -mt-[0.4rem]">
         Berdasarkan total duduk hari ini ({totalSittingToday} menit)
       </p>
 
       {/* Result */}
       {riskLoading ? (
-        <div className="risk-loading">
-          <div className="risk-spinner" />
+        <div className="flex items-center gap-4 p-6 text-text-secondary">
+          <div className="w-6 h-6 border-[3px] border-bg-2 border-t-primary rounded-full animate-spin" />
           <span>Menganalisis...</span>
         </div>
       ) : info ? (
         <div
-          className="risk-result"
+          className="rounded-md border p-4 animate-fade-in flex flex-col gap-4"
           style={{ background: info.bg, borderColor: info.border }}
         >
-          <div className="risk-result__top">
-            <span className="risk-result__emoji">{info.emoji}</span>
+          <div className="flex items-start gap-4">
+            <span className="text-[2rem]">{info.emoji}</span>
             <div>
-              <div className="risk-result__level" style={{ color: info.color }}>
+              <div className="text-base font-semibold mb-1" style={{ color: info.color }}>
                 Risiko <strong>{info.label}</strong>
               </div>
-              <p className="risk-result__desc">{info.desc}</p>
+              <p className="text-[0.84rem] text-text">{info.desc}</p>
             </div>
           </div>
 
-          <ul className="risk-tips">
+          <ul className="list-none flex flex-col gap-[0.4rem]">
             {tips.map((tip) => (
-              <li key={tip} className="risk-tip">
-                <span className="risk-tip__dot" style={{ background: info.color }} />
+              <li key={tip} className="flex items-center gap-2 text-[0.84rem]">
+                <span className="w-2 h-2 rounded-full shrink-0" style={{ background: info.color }} />
                 {tip}
               </li>
             ))}
           </ul>
         </div>
       ) : (
-        <div className="risk-empty">
-          <span className="risk-empty__icon">🤔</span>
+        <div className="text-center py-8 text-text-secondary flex flex-col items-center gap-2">
+          <span className="text-[2.5rem]">🤔</span>
           <p>Belum ada prediksi.</p>
-          <p className="risk-empty__hint">Mulai timer untuk mendapat analisis otomatis.</p>
+          <p className="text-[0.82rem]">Mulai timer untuk mendapat analisis otomatis.</p>
         </div>
       )}
 
       {/* Manual check */}
-      <div className="risk-manual">
-        <p className="risk-manual__label">Cek manual (masukkan menit duduk):</p>
-        <div className="risk-manual__row">
+      <div className="pt-4 border-t border-border flex flex-col gap-2">
+        <p className="text-[0.82rem] text-text-secondary">Cek manual (masukkan menit duduk):</p>
+        <div className="flex gap-2">
           <input
             type="number"
             min="0"
@@ -94,10 +93,10 @@ export default function RiskCard() {
             placeholder="mis. 120"
             value={manualMin}
             onChange={(e) => setManualMin(e.target.value)}
-            className="risk-manual__input"
+            className="flex-1 px-[0.9rem] py-[0.6rem] border-[1.5px] border-border rounded-full text-[0.9rem] font-body text-text bg-bg outline-none focus:border-primary-light transition-colors"
           />
           <button
-            className="btn btn-primary"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-[0.95rem] font-semibold transition-all bg-primary text-white shadow-[0_4px_14px_rgba(15,118,110,0.4)] hover:bg-primary-dark hover:-translate-y-px cursor-pointer border-none"
             onClick={handleManualCheck}
             disabled={riskLoading}
           >
