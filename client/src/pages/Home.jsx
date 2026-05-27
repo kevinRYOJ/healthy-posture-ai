@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useApp } from '../context/AppContext';
 
 const FEATURES = [
   { icon: '⏱️', title: 'Timer Cerdas', desc: 'Lacak durasi duduk secara real-time dengan pengingat otomatis setiap 45 menit.' },
@@ -14,6 +15,20 @@ const FAQS = [
 ];
 
 export default function Home() {
+  const { healthScore = 100, totalSittingToday = 0, sessions = [], riskLevel } = useApp();
+
+  const today = new Date().toDateString();
+  const todaySessions = sessions.filter(s => s && s.start && new Date(s.start).toDateString() === today);
+  const totalBreaks = todaySessions.reduce((acc, s) => acc + (s.breaksTaken || 0), 0);
+
+  const getLevel = (score) => {
+    if (score >= 90) return { title: 'Champion', icon: '🏆' };
+    if (score >= 70) return { title: 'Active', icon: '⭐' };
+    if (score >= 50) return { title: 'Beginner', icon: '🌱' };
+    return { title: 'Needs Action', icon: '⚠️' };
+  };
+  const lvl = getLevel(healthScore);
+
   return (
     <main className="pb-12">
       {/* Hero */}
@@ -43,12 +58,12 @@ export default function Home() {
             <div className="absolute -top-10 -right-10 w-[140px] h-[140px] bg-white/[0.07] rounded-full pointer-events-none" />
             
             <div className="text-[0.75rem] tracking-wider uppercase opacity-75 z-10 relative">Health Score Hari Ini</div>
-            <div className="font-heading text-[4rem] font-extrabold leading-none z-10 relative">87</div>
-            <div className="text-base font-semibold bg-white/15 px-3 py-[0.3rem] rounded-full z-10 relative">🏆 Champion</div>
+            <div className="font-heading text-[4rem] font-extrabold leading-none z-10 relative">{healthScore}</div>
+            <div className="text-base font-semibold bg-white/15 px-3 py-[0.3rem] rounded-full z-10 relative">{lvl.icon} {lvl.title}</div>
             <div className="flex gap-4 mt-2 pt-2 border-t border-white/20 w-full justify-around z-10 relative">
-              <div className="flex flex-col items-center gap-0.5"><strong className="font-heading text-[1.1rem] font-bold">120</strong><span className="text-[0.65rem] opacity-70 uppercase tracking-wider">menit duduk</span></div>
-              <div className="flex flex-col items-center gap-0.5"><strong className="font-heading text-[1.1rem] font-bold">3</strong><span className="text-[0.65rem] opacity-70 uppercase tracking-wider">jeda diambil</span></div>
-              <div className="flex flex-col items-center gap-0.5"><strong className="font-heading text-[1.1rem] font-bold">Low</strong><span className="text-[0.65rem] opacity-70 uppercase tracking-wider">risiko</span></div>
+              <div className="flex flex-col items-center gap-0.5"><strong className="font-heading text-[1.1rem] font-bold">{totalSittingToday}</strong><span className="text-[0.65rem] opacity-70 uppercase tracking-wider">menit duduk</span></div>
+              <div className="flex flex-col items-center gap-0.5"><strong className="font-heading text-[1.1rem] font-bold">{totalBreaks}</strong><span className="text-[0.65rem] opacity-70 uppercase tracking-wider">jeda diambil</span></div>
+              <div className="flex flex-col items-center gap-0.5"><strong className="font-heading text-[1.1rem] font-bold">{riskLevel || '-'}</strong><span className="text-[0.65rem] opacity-70 uppercase tracking-wider">risiko</span></div>
             </div>
           </div>
         </div>

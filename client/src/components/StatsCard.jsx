@@ -53,12 +53,45 @@ export default function StatsCard() {
 
   const sitting = totalSittingToday;
 
+  // Threshold total duduk (lebih ketat & realistis)
   const sittingStatus =
-    sitting > 480
+    sitting > 120
       ? 'Berbahaya'
-      : sitting > 300
-        ? 'Sedang'
-        : 'Baik';
+      : sitting > 60
+        ? 'Perlu Istirahat'
+        : sitting > 30
+          ? 'Sedang'
+          : 'Baik';
+
+  const sittingStatusColor =
+    sitting > 120
+      ? 'var(--color-danger)'
+      : sitting > 60
+        ? 'var(--color-warning)'
+        : 'var(--color-primary)';
+
+  // Threshold terlama duduk (sesuai reminder 30 menit)
+  const longestStatus =
+    longestSitting >= 60
+      ? '⚠️ berbahaya!'
+      : longestSitting >= 30
+        ? '⚠️ terlalu lama'
+        : '✅ oke';
+
+  const longestColor =
+    longestSitting >= 60
+      ? 'var(--color-danger)'
+      : longestSitting >= 30
+        ? 'var(--color-warning)'
+        : 'var(--color-primary)';
+
+  // Health score color
+  const scoreColor =
+    healthScore >= 80
+      ? 'var(--color-success)'
+      : healthScore >= 50
+        ? 'var(--color-warning)'
+        : 'var(--color-danger)';
 
   return (
     <div className="bg-white rounded-lg p-8 shadow-md border border-border flex flex-col gap-4">
@@ -71,7 +104,7 @@ export default function StatsCard() {
           label="Total Duduk"
           value={`${sitting} mnt`}
           sub={sittingStatus}
-          color="var(--color-primary)"
+          color={sittingStatusColor}
         />
 
         <StatItem
@@ -84,20 +117,15 @@ export default function StatsCard() {
         <StatItem
           label="Terlama Duduk"
           value={`${longestSitting} mnt`}
-          sub={
-            longestSitting > 60
-              ? '⚠️ terlalu lama'
-              : '✅ oke'
-          }
-          color="var(--color-warning)"
+          sub={longestStatus}
+          color={longestColor}
         />
 
         <StatItem
-          icon="💯"
           label="Health Score"
           value={healthScore}
           sub="/ 100"
-          color="var(--color-success)"
+          color={scoreColor}
         />
       </div>
     </div>

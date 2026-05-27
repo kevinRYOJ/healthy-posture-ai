@@ -35,13 +35,30 @@ app.use('/api/auth/register', users());
 app.use('/api/auth/login', authentications());
 
 // Profile
-app.get('/api/auth/me', auth, (req, res) => {
-    return res.json({
-        status: 'success',
-        data: {
-            user: req.user,
-        },
-    });
+app.get('/api/auth/me', auth, async (req, res) => {
+    try {
+        const UsersService = require('./services/postgres/UsersService');
+        const usersService = new UsersService();
+        const user = await usersService.getUserById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({
+                status: 'fail',
+                message: 'User tidak ditemukan',
+            });
+        }
+
+        return res.json({
+            status: 'success',
+            data: { user },
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({
+            status: 'error',
+            message: 'Internal server error',
+        });
+    }
 });
 
 app.put('/api/auth/profile', auth, async (req, res) => {

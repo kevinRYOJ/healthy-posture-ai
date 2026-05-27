@@ -57,44 +57,7 @@ function isValidDate(value) {
   return value && !Number.isNaN(new Date(value).getTime());
 }
 
-function calcHealthScore(sessions, user) {
-  let baseScore = 100;
-
-  // Denda berdasarkan data personalisasi profil user
-  if (user && user.has_personalized) {
-    const bmi = parseFloat(user.bmi);
-    if (!isNaN(bmi)) {
-      if (bmi > 30) baseScore -= 10;
-      else if (bmi > 25) baseScore -= 5;
-    }
-    const sleep = parseFloat(user.sleep_hours);
-    if (!isNaN(sleep)) {
-      if (sleep < 5) baseScore -= 10;
-      else if (sleep < 6) baseScore -= 5;
-    }
-    if (user.fitness_level === 'Low') baseScore -= 10;
-    else if (user.fitness_level === 'Medium') baseScore -= 5;
-  }
-
-  const today = new Date().toDateString();
-  const todaySessions = sessions.filter(
-    (s) => s && isValidDate(s.start) && new Date(s.start).toDateString() === today
-  );
-
-  // Jika belum ada sesi duduk, skor hanya terpengaruh profil
-  if (todaySessions.length === 0) return Math.min(100, Math.max(0, Math.round(baseScore)));
-
-  // Hitung penalti dari sesi duduk
-  let score = baseScore;
-  for (const s of todaySessions) {
-    const durationMin = toNumber(s.duration) / 60;
-    if (durationMin > 60) score -= 10;
-    if (durationMin > 90) score -= 15;
-    if (toNumber(s.breaksTaken) === 0 && durationMin > 30) score -= 5;
-    if (toNumber(s.breaksTaken) > 0) score += 3;
-  }
-  return Math.max(0, Math.min(100, Math.round(score)));
-}
+// Logika health score sekarang pindah ke backend (server/src/utils/healthScore.js)
 
 function calcTodaySitting(sessions) {
   const today = new Date().toDateString();
@@ -109,14 +72,14 @@ export function AppProvider({ children }) {
   const [riskLevel, setRiskLevel] = useState(null);
   const [riskLoading, setRiskLoading] = useState(false);
   const [sessionsLoading, setSessionsLoading] = useState(false);
+  const [baseHealthScore, setBaseHealthScore] = useState(100);
 
   // Inisialisasi global timer
   const timer = useTimer();
 
-  // Gabungkan skor sesi lokal + prediksi AI + personalisasi user
-  const baseScore = calcHealthScore(sessions, user);
+  // Gabungkan skor sesi dari API + prediksi AI lokal
   const riskModifier = riskLevel === 'Tinggi' ? -25 : riskLevel === 'Medium' ? -10 : riskLevel === 'Low' ? 5 : 0;
-  const healthScore = Math.max(0, Math.min(100, baseScore + riskModifier));
+  const healthScore = Math.max(0, Math.min(100, baseHealthScore + riskModifier));
   const totalSittingToday = calcTodaySitting(sessions);
 
   const loadSessions = useCallback(async () => {
@@ -132,6 +95,9 @@ export function AppProvider({ children }) {
         .map(normalizeSession)
         .filter(Boolean);
       setSessions(normalized);
+      if (data.baseHealthScore !== undefined) {
+        setBaseHealthScore(data.baseHealthScore);
+      }
     } catch (err) {
       console.warn('Gagal mengambil sessions:', err.message);
       setSessions([]);
@@ -140,9 +106,19 @@ export function AppProvider({ children }) {
     }
   }, []);
 
+  // Muat ulang sessions setiap kali user berubah (login/logout/register)
   useEffect(() => {
-    loadSessions();
-  }, [loadSessions]);
+    if (user) {
+      // User baru login/register → muat sessions milik user ini
+      loadSessions();
+    } else {
+      // User logout → bersihkan semua state
+      setSessions([]);
+      setRiskLevel(null);
+      setBaseHealthScore(100);
+      timer.reset();
+    }
+  }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const alarmAudioRef = useRef(null);
 
@@ -228,6 +204,9 @@ export function AppProvider({ children }) {
       const data = await apiCreateSession(payload);
       const normalized = normalizeSession(data.session);
       setSessions((prev) => [normalized, ...prev]);
+      if (data.baseHealthScore !== undefined) {
+        setBaseHealthScore(data.baseHealthScore);
+      }
     } catch (error) {
       console.error('Gagal menyimpan session ke server:', error.message);
     }
@@ -241,6 +220,7 @@ export function AppProvider({ children }) {
     }
     setSessions([]);
     setRiskLevel(null);
+    setBaseHealthScore(100);
   }, []);
 
   return (
