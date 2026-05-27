@@ -138,7 +138,15 @@ app.post('/predict', auth, async (req, res) => {
         const rawArray = FEATURE_ORDER.map(col => { const val = inputValues[col]; return (val !== undefined && val !== null && !isNaN(val)) ? val : 0; });
         const scaledArray = rawArray.map((val, i) => (val - (mlMetadata.scaler.mean[i] || 0)) / (mlMetadata.scaler.scale[i] || 1));
 
-        const payload = JSON.stringify(scaledArray);
+        const contextData = {
+            name: user.name || 'User',
+            age: user.age,
+            work_type: user.work_type,
+            total_sitting_minutes: total_sitting,
+            number_of_breaks: number_of_breaks
+        };
+
+        const payload = JSON.stringify({ features: scaledArray, context: contextData });
         const pyReq = http.request({ hostname: '127.0.0.1', port: 5001, path: '/predict', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) } }, (pyRes) => {
             let data = ''; pyRes.on('data', (chunk) => data += chunk);
             pyRes.on('end', () => {
@@ -147,7 +155,7 @@ app.post('/predict', auth, async (req, res) => {
                     if (result.error) throw new Error(result.error);
                     const riskLevel = mlMetadata.target[result.max_idx];
                     console.log(`🤖 Predict: ${riskLevel} (${(result.confidence * 100).toFixed(1)}%) | sitting=${total_sitting}min`);
-                    res.json({ status: 'success', data: { risk_level: riskLevel, confidence: result.confidence } });
+                    res.json({ status: 'success', data: { risk_level: riskLevel, confidence: result.confidence, insight: result.insight } });
                 } catch(e) { res.status(500).json({ status: 'error', message: 'Invalid response from Python model' }); }
             });
         });
