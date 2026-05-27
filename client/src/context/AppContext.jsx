@@ -70,6 +70,7 @@ export function AppProvider({ children }) {
   const { user } = useAuth();
   const [sessions, setSessions] = useState([]);
   const [riskLevel, setRiskLevel] = useState(null);
+  const [riskInsight, setRiskInsight] = useState(null);
   const [riskLoading, setRiskLoading] = useState(false);
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const [baseHealthScore, setBaseHealthScore] = useState(100);
@@ -115,6 +116,7 @@ export function AppProvider({ children }) {
       // User logout → bersihkan semua state
       setSessions([]);
       setRiskLevel(null);
+      setRiskInsight(null);
       setBaseHealthScore(100);
       timer.reset();
     }
@@ -181,9 +183,13 @@ export function AppProvider({ children }) {
     try {
       const data = await predictRisk(minutes);
       setRiskLevel(data.data.risk_level);
+      if (data.data.insight) {
+        setRiskInsight(data.data.insight);
+      }
     } catch (err) {
       console.warn('Risk prediction gagal:', err.message);
       setRiskLevel(null);
+      setRiskInsight(null);
     } finally {
       setRiskLoading(false);
     }
@@ -220,6 +226,7 @@ export function AppProvider({ children }) {
     }
     setSessions([]);
     setRiskLevel(null);
+    setRiskInsight(null);
     setBaseHealthScore(100);
   }, []);
 
@@ -231,6 +238,7 @@ export function AppProvider({ children }) {
       healthScore,
       totalSittingToday,
       riskLevel,
+      riskInsight,
       riskLoading,
       fetchRisk,
       sessionsLoading,

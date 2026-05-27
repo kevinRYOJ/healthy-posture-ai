@@ -23,7 +23,7 @@ const TIPS = {
 };
 
 export default function RiskCard() {
-  const { riskLevel, riskLoading, totalSittingToday, fetchRisk } = useApp();
+  const { riskLevel, riskLoading, totalSittingToday, fetchRisk, riskInsight } = useApp();
   const [manualMin, setManualMin] = useState('');
 
   const info = riskLevel ? RISK_INFO[riskLevel] : null;
@@ -57,11 +57,19 @@ export default function RiskCard() {
         >
           <div className="flex items-start gap-4">
             <span className="text-[2rem]">{info.emoji}</span>
-            <div>
-              <div className="text-base font-semibold mb-1" style={{ color: info.color }}>
+            <div className="flex flex-col gap-1">
+              <div className="text-base font-semibold" style={{ color: info.color }}>
                 Risiko <strong>{info.label}</strong>
               </div>
               <p className="text-[0.84rem] text-text">{info.desc}</p>
+              {riskInsight && (
+                <div className="mt-2 p-3 bg-white/60 rounded-md border border-white/50 relative">
+                  <span className="absolute -top-2 -right-1 text-lg">✨</span>
+                  <p className="text-[0.85rem] text-text italic leading-relaxed">
+                    "{riskInsight}"
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
