@@ -79,7 +79,7 @@ try {
 }
 
 const pythonPath = path.join(__dirname, '../../venv/Scripts/python.exe');
-const scriptPath = path.join(__dirname, 'model_server.py');
+const scriptPath = path.join(__dirname, '../model_server.py');
 
 const pythonProcess = spawn(pythonPath, [scriptPath], {
     stdio: ['ignore', 'pipe', 'pipe']

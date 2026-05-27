@@ -15,7 +15,7 @@ app = Flask(__name__)
 CORS(app) # Mengizinkan Node.js mengakses Flask tanpa diblokir CORS
 
 print("Loading Keras model (this takes ~20 seconds)...")
-model_path = os.path.join(os.path.dirname(__file__), '../ml_models/healthy_posture_model.keras')
+model_path = os.path.join(os.path.dirname(__file__), 'ml_models/healthy_posture_model.keras')
 model = tf.keras.models.load_model(model_path)
 print("Python Flask Model Server running on http://127.0.0.1:5001")
 

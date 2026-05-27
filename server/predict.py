@@ -4,7 +4,7 @@ import tensorflow as tf
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
-model_path = os.path.join(os.path.dirname(__file__), '../ml_models/healthy_posture_model.keras')
+model_path = os.path.join(os.path.dirname(__file__), 'ml_models/healthy_posture_model.keras')
 model = tf.keras.models.load_model(model_path)
 
 def main():
