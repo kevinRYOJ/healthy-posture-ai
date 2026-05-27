@@ -1,6 +1,9 @@
+const { calcHealthScore } = require('../../utils/healthScore');
+
 class SessionsHandler {
-    constructor(service) {
+    constructor(service, usersService) {
         this._service = service;
+        this._usersService = usersService;
 
         this.getSessionsHandler =
             this.getSessionsHandler.bind(this);
@@ -16,9 +19,13 @@ class SessionsHandler {
         try {
             const userId = req.user.id;
             const sessions = await this._service.getSessions(userId);
+            const user = await this._usersService.getUserById(userId);
+
+            const baseHealthScore = calcHealthScore(sessions, user);
 
             return res.json({
                 status: 'success',
+                baseHealthScore,
                 sessions,
             });
 
@@ -43,8 +50,13 @@ class SessionsHandler {
                     ...req.body,
                 });
 
+            const sessions = await this._service.getSessions(userId);
+            const user = await this._usersService.getUserById(userId);
+            const baseHealthScore = calcHealthScore(sessions, user);
+
             return res.status(201).json({
                 status: 'success',
+                baseHealthScore,
                 session,
             });
 
