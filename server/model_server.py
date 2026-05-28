@@ -1,42 +1,35 @@
 import os
-# Bypass protobuf version error for TensorFlow
-try:
-    import google.protobuf.runtime_version
-    google.protobuf.runtime_version.ValidateProtobufRuntimeVersion = lambda *args, **kwargs: None
-except ImportError:
-    pass
-
-import numpy as np
-import tensorflow as tf
+import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import google.generativeai as genai
-
+import requests
 import logging
+
 log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR) 
+log.setLevel(logging.ERROR)
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
-#Inisialisasi Gemini API
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
-gemini_model = genai.GenerativeModel('gemini-2.5-flash')
 
-#inisialisasi Flask app
+def generate_gemini_json(prompt):
+    if not GEMINI_API_KEY:
+        raise Exception("API Key is missing")
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={GEMINI_API_KEY}"
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"response_mime_type": "application/json"}
+    }
+    response = requests.post(url, headers={"Content-Type": "application/json"}, json=payload)
+    if response.status_code == 200:
+        return response.json()["candidates"][0]["content"]["parts"][0]["text"]
+    else:
+        raise Exception(f"API Error {response.status_code}: {response.text}")
+
 app = Flask(__name__)
-CORS(app) 
+CORS(app)
 
-print("Loading Model Keras")
-model_path = os.path.join(os.path.dirname(__file__), 'ml_models/healthy_posture_model.keras')
-model = tf.keras.models.load_model(model_path)
+print("Starting Python Flask Model Server (Powered by Gemini)...")
 print("Python Flask Model Server running on http://127.0.0.1:5001")
 
-#Mapping label
-RISK_LABELS = ["Low", "Medium", "Tinggi"]
-
-#Routing
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
@@ -44,58 +37,45 @@ def predict():
         if not data:
             return jsonify({"error": "No JSON data provided"}), 400
 
-        if isinstance(data, dict) and "features" in data:
-            features = data["features"]
-            context_data = data.get("context", {})
-        else:
-            features = data
-            context_data = {}
+        context_data = data.get("context", {})
 
-        scaled_array = np.array(features, dtype=np.float32).reshape(1, -1)
-        
-        preds = model.predict(scaled_array, verbose=0)[0]
-        max_idx = int(np.argmax(preds))
-        conf = float(preds[max_idx])
-        pred_label = RISK_LABELS[max_idx]
+        prompt = f"""Kamu adalah asisten kesehatan ergonomi tubuh dan sistem pakar deteksi postur duduk.
+Tugasmu adalah menganalisis data pengguna berikut dan memprediksi Tingkat Risiko Postur (Low, Medium, atau Tinggi).
 
-        #Membuat insight
-        prompt = f"""Kamu adalah asisten kesehatan ergonomi tubuh yang ramah. 
-Sistem kami mendeteksi risiko kesehatan postur duduk pengguna saat ini berada pada tingkat: '{pred_label}'."""
-        
-        if context_data:
-            prompt += f"""
-Konteks Pengguna:
+Data Pengguna:
 - Nama: {context_data.get('name', 'User')}
 - Usia: {context_data.get('age', 'Tidak diketahui')}
 - Pekerjaan: {context_data.get('work_type', 'Tidak diketahui')}
 - Total duduk hari ini: {context_data.get('total_sitting_minutes', 0)} menit
 - Total jeda hari ini: {context_data.get('number_of_breaks', 0)} kali
 
-Berikan 1 paragraf singkat (maksimal 2 kalimat) berupa motivasi atau saran praktis yang PERSONAL berdasarkan profesi atau pola duduknya di atas. 
-Gunakan bahasa Indonesia yang kasual, suportif, dan sebutkan profesinya atau keadaannya (misal duduk terlalu lama) agar terasa relevan. Jangan kaku.
-Jangan sebutkan bahwa kamu adalah AI.
-"""
-        else:
-            prompt += """
-Berikan 1 paragraf singkat (maksimal 2 kalimat) berupa motivasi atau saran praktis agar user menjaga postur atau beristirahat. 
-Gunakan bahasa Indonesia yang kasual dan suportif. Jangan sebutkan bahwa kamu adalah AI.
-"""
-        
-        #Generate insight
+Berdasarkan data di atas, tentukan:
+1. "pred_label": (Low / Medium / Tinggi)
+2. "max_idx": (0 untuk Low, 1 untuk Medium, 2 untuk Tinggi)
+3. "confidence": (angka desimal antara 0.0 hingga 1.0 yang menunjukkan keyakinanmu)
+4. "insight": (1 paragraf singkat maksimal 2 kalimat berupa motivasi atau saran praktis berdasarkan profesi/pola duduknya. Gunakan bahasa Indonesia kasual, suportif. Jangan sebutkan bahwa kamu AI.)
+
+Kembalikan jawabanmu HANYA dalam format JSON yang valid persis seperti ini:
+{{
+  "max_idx": 1,
+  "confidence": 0.85,
+  "pred_label": "Medium",
+  "insight": "..."
+}}"""
+
         try:
-            response = gemini_model.generate_content(prompt)
-            insight_text = response.text.strip()
+            gemini_response = generate_gemini_json(prompt).strip()
+            result = json.loads(gemini_response)
         except Exception as e:
             print(f"Gemini API Error: {e}")
-            insight_text = "Jangan lupa luangkan waktu sejenak untuk berdiri dan peregangan agar tubuh tetap fit ya!"
+            result = {
+                "max_idx": 1,
+                "confidence": 0.5,
+                "pred_label": "Medium",
+                "insight": "Jangan lupa luangkan waktu sejenak untuk berdiri dan peregangan agar tubuh tetap fit ya!"
+            }
 
-        #Mengembalikan ke Node.JS
-        return jsonify({
-            "max_idx": max_idx, 
-            "confidence": conf,
-            "pred_label": pred_label,
-            "insight": insight_text
-        }), 200
+        return jsonify(result), 200
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
