@@ -71,13 +71,21 @@ class SessionsHandler {
     }
 
     async deleteSessionsHandler(req, res) {
-        const { id: credentialId } = req.auth.credentials;
-        await this._service.deleteAllSessionsByUserId(credentialId);
+        try {
+            const userId = req.user.id;
+            await this._service.deleteAllSessionsByUserId(userId);
 
-        return res.json({
-            status: 'success',
-            message: 'Riwayat sesi berhasil dihapus',
-        });
+            return res.json({
+                status: 'success',
+                message: 'Riwayat sesi berhasil dihapus',
+            });
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({
+                status: 'error',
+                message: 'Terjadi kegagalan pada server kami',
+            });
+        }
     }
 }
 
