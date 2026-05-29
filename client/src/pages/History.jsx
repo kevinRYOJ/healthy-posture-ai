@@ -1,6 +1,7 @@
 import { useApp } from '../context/AppContext';
 import { formatTime } from '../hooks/useTimer';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { Trash2 } from 'lucide-react';
 
 function formatDate(iso) {
   return new Date(iso).toLocaleString('id-ID', {
@@ -11,7 +12,7 @@ function formatDate(iso) {
 
 // Menghitung data grafik per hari (7 hari terakhir)
 function processChartData(sessions) {
-  const last7Days = Array.from({length: 7}).map((_, i) => {
+  const last7Days = Array.from({ length: 7 }).map((_, i) => {
     const d = new Date();
     d.setDate(d.getDate() - (6 - i));
     return d.toDateString();
@@ -50,12 +51,12 @@ export default function History() {
           <h1 className="text-[clamp(1.5rem,3vw,2rem)] font-extrabold text-text">Riwayat & Analitik</h1>
           <p className="text-[0.9rem] text-text-secondary mt-1">{sessions.length} sesi tersimpan</p>
         </div>
-        <button 
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-[0.95rem] font-semibold transition-all bg-bg-2 text-primary border-2 border-primary-light hover:bg-primary-light hover:text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" 
+        <button
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-[0.95rem] font-semibold transition-all bg-red-300 text-red-700 border-2 border-red-400 hover:bg-red-700 hover:text-white cursor-pointer disabled:cursor-not-allowed"
           onClick={clearSessions}
           disabled={sessions.length === 0}
         >
-          🗑️ Hapus Semua
+          <Trash2 size={18} /> Hapus Semua
         </button>
       </div>
 
@@ -69,7 +70,7 @@ export default function History() {
               <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} />
               <YAxis yAxisId="left" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} />
               <YAxis yAxisId="right" orientation="right" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748B' }} />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                 cursor={{ fill: '#F1F5F9' }}
               />
@@ -89,38 +90,38 @@ export default function History() {
       ) : (
         <>
           {todaySessions.length > 0 && (
-        <section className="flex flex-col gap-4 animate-fade-in">
-          <h2 className="text-base font-bold text-primary uppercase tracking-wider font-heading">Hari Ini</h2>
-          <SessionTable sessions={todaySessions} />
-        </section>
-      )}
+            <section className="flex flex-col gap-4 animate-fade-in">
+              <h2 className="text-base font-bold text-primary uppercase tracking-wider font-heading">Hari Ini</h2>
+              <SessionTable sessions={todaySessions} />
+            </section>
+          )}
 
-      {pastSessions.length > 0 && (
-        <section className="flex flex-col gap-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>
-          <h2 className="text-base font-bold text-primary uppercase tracking-wider font-heading">Sebelumnya</h2>
-          <SessionTable sessions={pastSessions} />
-        </section>
-      )}
+          {pastSessions.length > 0 && (
+            <section className="flex flex-col gap-4 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <h2 className="text-base font-bold text-primary uppercase tracking-wider font-heading">Sebelumnya</h2>
+              <SessionTable sessions={pastSessions} />
+            </section>
+          )}
 
-      {/* Summary */}
-      <div className="bg-white rounded-lg p-8 shadow-md border border-border flex flex-col gap-4 animate-fade-in" style={{ animationDelay: '0.15s' }}>
-        <h3 className="text-[1.1rem] text-primary font-heading font-bold">Statistik Keseluruhan</h3>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-4">
-          <Stat label="Total Sesi" value={sessions.length} />
-          <Stat
-            label="Total Duduk"
-            value={`${sessions.reduce((a, s) => a + Math.floor(s.duration / 60), 0)} mnt`}
-          />
-          <Stat
-            label="Total Jeda"
-            value={sessions.reduce((a, s) => a + s.breaksTaken, 0)}
-          />
-          <Stat
-            label="Rata-rata Durasi"
-            value={`${Math.round(sessions.reduce((a, s) => a + s.duration / 60, 0) / sessions.length || 0)} mnt`}
-          />
-        </div>
-      </div>
+          {/* Summary */}
+          <div className="bg-white rounded-lg p-8 shadow-md border border-border flex flex-col gap-4 animate-fade-in" style={{ animationDelay: '0.15s' }}>
+            <h3 className="text-[1.1rem] text-primary font-heading font-bold">Statistik Keseluruhan</h3>
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-4">
+              <Stat label="Total Sesi" value={sessions.length} />
+              <Stat
+                label="Total Duduk"
+                value={`${sessions.reduce((a, s) => a + Math.floor(s.duration / 60), 0)} mnt`}
+              />
+              <Stat
+                label="Total Jeda"
+                value={sessions.reduce((a, s) => a + s.breaksTaken, 0)}
+              />
+              <Stat
+                label="Rata-rata Durasi"
+                value={`${Math.round(sessions.reduce((a, s) => a + s.duration / 60, 0) / sessions.length || 0)} mnt`}
+              />
+            </div>
+          </div>
         </>
       )}
     </main>

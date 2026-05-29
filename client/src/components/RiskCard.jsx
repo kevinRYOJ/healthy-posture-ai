@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { Bot } from 'lucide-react';
 
 const RISK_INFO = {
   Low: {
@@ -17,9 +18,9 @@ const RISK_INFO = {
 };
 
 const TIPS = {
-  Low:    ['Lakukan peregangan ringan tiap jam', 'Pastikan monitor sejajar mata', 'Minum air setiap 30 menit'],
+  Low: ['Lakukan peregangan ringan tiap jam', 'Pastikan monitor sejajar mata', 'Minum air setiap 30 menit'],
   Medium: ['Istirahat 5 menit tiap 45 menit', 'Cek posisi punggung & leher', 'Pertimbangkan standing desk'],
-  Tinggi:   ['Istirahat SEKARANG minimal 15 menit', 'Lakukan peregangan punggung & leher', 'Batasi duduk max 1 jam tanpa jeda'],
+  Tinggi: ['Istirahat SEKARANG minimal 15 menit', 'Lakukan peregangan punggung & leher', 'Batasi duduk max 1 jam tanpa jeda'],
 };
 
 export default function RiskCard() {
@@ -38,7 +39,7 @@ export default function RiskCard() {
     <div className="bg-white rounded-lg p-8 shadow-md border border-border flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h2 className="text-[1.25rem] text-primary font-heading font-bold">Prediksi Risiko AI</h2>
-        <span className="text-[0.72rem] font-mono bg-primary text-white px-2 py-[0.2rem] rounded-sm">🤖 /predict</span>
+        <span className="flex items-center gap-1 text-[0.72rem] font-mono bg-primary text-white px-2 py-[0.2rem] rounded-sm"><Bot size={14} /> /predict</span>
       </div>
       <p className="text-[0.84rem] text-text-secondary -mt-[0.4rem]">
         Berdasarkan total duduk hari ini ({totalSittingToday} menit)

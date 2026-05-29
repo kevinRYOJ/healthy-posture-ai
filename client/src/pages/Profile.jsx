@@ -3,23 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useApp } from '../context/AppContext';
 import { updateProfile } from '../api';
+import { UserPen, Trash2, LogOut, Trophy, TriangleAlert, Flame, Snowflake } from 'lucide-react';
 
 export default function Profile() {
   const { user, logout, updateUser } = useAuth();
   const { sessions, healthScore, totalSittingToday, clearSessions } = useApp();
   const navigate = useNavigate();
 
-  const [editName, setEditName]   = useState(false);
-  const [name,     setName]       = useState(user?.name || '');
-  const [saving,   setSaving]     = useState(false);
-  const [success,  setSuccess]    = useState('');
-  const [error,    setError]      = useState('');
+  const [editName, setEditName] = useState(false);
+  const [name, setName] = useState(user?.name || '');
+  const [saving, setSaving] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
 
   // Stats
-  const totalSessions   = sessions.length;
+  const totalSessions = sessions.length;
   const totalSittingAll = sessions.reduce((a, s) => a + Math.floor(s.duration / 60), 0);
-  const totalBreaks     = sessions.reduce((a, s) => a + s.breaksTaken, 0);
-  const joinDate        = user?.createdAt
+  const totalBreaks = sessions.reduce((a, s) => a + s.breaksTaken, 0);
+  const joinDate = user?.createdAt
     ? new Date(user.createdAt).toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' })
     : '—';
 
@@ -79,14 +80,14 @@ export default function Profile() {
             <div className="flex items-center gap-2">
               <h2 className="text-2xl font-bold text-text">{user?.name}</h2>
               <button className="bg-transparent text-base cursor-pointer p-1 rounded-sm hover:bg-bg-2 transition-colors leading-none border-none" onClick={() => setEditName(true)} title="Edit nama">
-                ✏️
+                <UserPen />
               </button>
             </div>
           )}
           <p className="text-[0.9rem] text-text-secondary">{user?.email}</p>
           <p className="text-[0.8rem] text-text-secondary">Bergabung sejak {joinDate}</p>
           {success && <p className="text-[0.85rem] text-success font-semibold">{success}</p>}
-          {error   && <p className="text-[0.85rem] text-danger font-semibold">{error}</p>}
+          {error && <p className="text-[0.85rem] text-danger font-semibold">{error}</p>}
         </div>
       </div>
 
@@ -94,22 +95,32 @@ export default function Profile() {
       <div className="flex flex-col gap-4">
         <h3 className="text-base font-bold text-primary uppercase tracking-wider">Statistik Akumulasi</h3>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(130px,1fr))] gap-4">
-          <StatBox icon="🪑" label="Total Sesi"    value={totalSessions} />
-          <StatBox icon="⏱️" label="Total Duduk"   value={`${totalSittingAll} mnt`} />
-          <StatBox icon="☕" label="Total Jeda"    value={totalBreaks} />
-          <StatBox icon="💯" label="Health Score"  value={`${healthScore}/100`} />
+          <StatBox icon="🪑" label="Total Sesi" value={totalSessions} />
+          <StatBox icon="⏱️" label="Total Duduk" value={`${totalSittingAll} mnt`} />
+          <StatBox icon="☕" label="Total Jeda" value={totalBreaks} />
+          <StatBox icon="💯" label="Health Score" value={`${healthScore}/100`} />
         </div>
       </div>
 
       {/* Gamifikasi & Badges */}
       <div className="bg-white rounded-lg p-8 shadow-md border border-border flex flex-col gap-4">
         <h3 className="text-base font-bold text-primary uppercase tracking-wider flex items-center justify-between">
-          <span>🏆 Lencana Pencapaian</span>
-          <span className="text-[0.8rem] text-text-secondary bg-bg px-3 py-1 rounded-full lowercase">
-            {totalSessions > 0 ? '🔥 Aktif' : '❄️ Belum Mulai'}
+          <span className='flex items-center gap-1 text-[12px] lg:text-lg'><Trophy size={20} /> Lencana Pencapaian</span>
+          <span className="text-[0.8rem] text-text-secondary bg-bg px-3 py-1 rounded-full lowercase inline-flex items-center gap-1">
+            {totalSessions > 0 ? (
+              <>
+                <Flame size={14} className="text-orange-500 shrink-0" />
+                Aktif
+              </>
+            ) : (
+              <>
+                <Snowflake size={14} className="text-sky-500 shrink-0" />
+                Belum Mulai
+              </>
+            )}
           </span>
         </h3>
-        
+
         <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4 mt-2">
           {/* Badge 1 */}
           <div className={`p-4 rounded-md border text-center flex flex-col gap-2 transition-all ${totalSessions > 0 ? 'border-primary-light bg-teal-50' : 'border-border bg-bg opacity-60 grayscale'}`}>
@@ -119,7 +130,7 @@ export default function Profile() {
               <p className="text-[0.75rem] text-text-secondary">Selesaikan sesi pertama</p>
             </div>
           </div>
-          
+
           {/* Badge 2 */}
           <div className={`p-4 rounded-md border text-center flex flex-col gap-2 transition-all ${totalBreaks >= 5 ? 'border-orange-300 bg-orange-50' : 'border-border bg-bg opacity-60 grayscale'}`}>
             <span className="text-[2.5rem]">☕</span>
@@ -142,7 +153,7 @@ export default function Profile() {
 
       {/* Danger zone */}
       <div className="bg-[#FFF5F5] rounded-lg p-8 shadow-md border border-red-200 flex flex-col gap-4">
-        <h3 className="text-base font-bold text-danger uppercase tracking-wider">⚠️ Zona Berbahaya</h3>
+        <h3 className="flex items-center gap-1 text-[12px] lg:text-lg font-bold text-danger uppercase tracking-wider"><TriangleAlert size={20} /> Zona Berbahaya</h3>
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between gap-4 flex-wrap p-4 bg-white rounded-md border border-red-200">
             <div>
@@ -150,7 +161,7 @@ export default function Profile() {
               <p className="text-[0.8rem] text-text-secondary mt-0.5">Semua data sesi akan dihapus permanen dari perangkat ini.</p>
             </div>
             <button className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-[0.95rem] font-semibold transition-all bg-danger text-white shadow-[0_4px_14px_rgba(239,68,68,0.3)] hover:bg-[#DC2626] hover:-translate-y-px cursor-pointer border-none" onClick={handleClear}>
-              🗑️ Hapus Data
+              <Trash2 size={20} /> Hapus Data
             </button>
           </div>
           <div className="flex items-center justify-between gap-4 flex-wrap p-4 bg-white rounded-md border border-red-200">
@@ -159,7 +170,7 @@ export default function Profile() {
               <p className="text-[0.8rem] text-text-secondary mt-0.5">Sesi login akan dihapus. Kamu perlu masuk kembali.</p>
             </div>
             <button className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-[0.95rem] font-semibold transition-all bg-danger text-white shadow-[0_4px_14px_rgba(239,68,68,0.3)] hover:bg-[#DC2626] hover:-translate-y-px cursor-pointer border-none" onClick={handleLogout}>
-              🚪 Logout
+              <LogOut size={20} /> Logout
             </button>
           </div>
         </div>
