@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { formatTime } from '../hooks/useTimer';
 import { useApp } from '../context/AppContext';
+import { Play, Pause, CircleStop, Repeat, AlarmClockCheck, SquareCheckBig, TriangleAlert, Coffee } from 'lucide-react';
 
 export default function Timer() {
   const { addSession, fetchRisk, totalSittingToday, timer } = useApp();
@@ -38,8 +39,30 @@ export default function Timer() {
       <div className="flex items-center justify-between">
         <h2 className="text-[1.25rem] text-primary font-heading font-bold">Timer Duduk</h2>
         {status !== 'IDLE' && (
-          <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${status === 'BREAK' ? 'bg-yellow-100 text-yellow-700' : isLongSitting ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-700'}`}>
-            {status === 'BREAK' ? '☕ Istirahat' : isLongSitting ? '⚠️ Terlalu lama!' : '✅ Aktif'}
+          <span
+            className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${status === 'BREAK'
+              ? 'bg-yellow-100 text-yellow-700'
+              : isLongSitting
+                ? 'bg-red-100 text-red-600'
+                : 'bg-green-100 text-green-700'
+              }`}
+          >
+            {status === 'BREAK' ? (
+              <>
+                <Coffee size={14} />
+                Istirahat
+              </>
+            ) : isLongSitting ? (
+              <>
+                <TriangleAlert size={14} />
+                Terlalu lama!
+              </>
+            ) : (
+              <>
+                <SquareCheckBig size={14} />
+                Aktif
+              </>
+            )}
           </span>
         )}
       </div>
@@ -66,7 +89,7 @@ export default function Timer() {
             <>
               <div className="text-[0.72rem] font-semibold tracking-widest uppercase text-text-secondary">Jeda ke-{breaksTaken + 1}</div>
               <div className="font-heading text-[2.4rem] font-bold text-warning tracking-tight leading-none animate-count-up">{formatTime(elapsedBreak)}</div>
-              <div className="text-[0.78rem] text-text-secondary">☕ istirahat</div>
+              <div className="text-[0.78rem] text-text-secondary flex items-center gap1"><Coffee size={14} className="text-yellow-500" /> istirahat</div>
             </>
           ) : (
             <>
@@ -80,8 +103,8 @@ export default function Timer() {
 
       {/* Warning banner */}
       {isLongSitting && (
-        <div className="bg-red-50 border border-red-200 rounded-md px-4 py-3 text-[0.88rem] font-medium text-danger text-center animate-fade-in">
-          ⚠️ Kamu sudah duduk {sittingMinutes} menit — segera istirahat!
+        <div className="flex items-center gap-1 bg-red-50 border border-red-200 rounded-md px-4 py-3 text-[0.88rem] font-medium text-danger text-center animate-fade-in">
+          <TriangleAlert size={14} /> Kamu sudah duduk {sittingMinutes} menit — segera istirahat!
         </div>
       )}
 
@@ -89,32 +112,32 @@ export default function Timer() {
       <div className="flex gap-2 justify-center flex-wrap">
         {status === 'IDLE' && (
           <button className="inline-flex items-center justify-center gap-2 px-[2.2rem] py-[0.9rem] rounded-full text-base font-semibold transition-all bg-primary text-white shadow-[0_4px_14px_rgba(15,118,110,0.4)] hover:bg-primary-dark hover:-translate-y-px cursor-pointer border-none" onClick={startSitting}>
-            ▶ Mulai Duduk
+            <Play /> Mulai Duduk
           </button>
         )}
 
         {status === 'SITTING' && (
           <>
             <button className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-[0.95rem] font-semibold transition-all bg-accent text-white shadow-[0_4px_14px_rgba(249,115,22,0.35)] hover:bg-[#EA6C0A] hover:-translate-y-px cursor-pointer border-none" onClick={takeBreak}>
-              ☕ Ambil Jeda
+              <Pause /> Ambil Jeda
             </button>
             <button className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-[0.95rem] font-semibold transition-all bg-danger text-white shadow-[0_4px_14px_rgba(239,68,68,0.3)] hover:bg-[#DC2626] hover:-translate-y-px cursor-pointer border-none" onClick={handleStop}>
-              ⏹ Selesai
+              <CircleStop /> Selesai
             </button>
           </>
         )}
 
         {status === 'BREAK' && (
           <button className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-[0.95rem] font-semibold transition-all bg-primary text-white shadow-[0_4px_14px_rgba(15,118,110,0.4)] hover:bg-primary-dark hover:-translate-y-px cursor-pointer border-none" onClick={resumeSitting}>
-            ▶ Lanjut Duduk
+            <Play /> Lanjut Duduk
           </button>
         )}
 
         {status === 'FINISHED' && (
           <div className="flex flex-col items-center gap-2">
-            <p className="font-semibold text-success">✅ Sesi selesai disimpan!</p>
+            <p className="flex gap-1 font-semibold text-success"><AlarmClockCheck /> Sesi selesai disimpan!</p>
             <button className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full text-[0.95rem] font-semibold transition-all bg-bg-2 text-primary border-2 border-primary-light hover:bg-primary-light hover:text-white cursor-pointer" onClick={reset}>
-              🔄 Mulai Sesi Baru
+              <Repeat /> Mulai Sesi Baru
             </button>
           </div>
         )}

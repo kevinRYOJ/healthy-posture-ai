@@ -22,6 +22,7 @@
   --color-text-secondary: #6B7280;
   --color-border: #CCFBF1;
   --color-shadow: rgba(15, 118, 110, 0.12);
+  --color-white: #FFFFFF;
 
   /* Font */
   --font-heading: 'Plus Jakarta Sans', sans-serif;
@@ -45,24 +46,55 @@
   --animate-count-up: countUp 0.3s ease;
 }
 
+.test {
+  background-color: #6B7280;
+}
+
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes pulse-ring {
-  0%   { transform: scale(1); opacity: 0.8; }
-  50%  { transform: scale(1.05); opacity: 0.5; }
-  100% { transform: scale(1); opacity: 0.8; }
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
 }
 
 @keyframes countUp {
-  from { opacity: 0; transform: scale(0.8); }
-  to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* ── Base styles ── */
@@ -81,7 +113,11 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5 {
+h1,
+h2,
+h3,
+h4,
+h5 {
   font-family: var(--font-heading);
   line-height: 1.2;
 }
@@ -103,8 +139,14 @@ img {
   display: block;
 }
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--color-bg-2); }
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-2);
+}
+
 ::-webkit-scrollbar-thumb {
   background: var(--color-primary-light);
   border-radius: 9999px;

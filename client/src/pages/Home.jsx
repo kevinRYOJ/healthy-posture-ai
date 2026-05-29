@@ -1,5 +1,13 @@
 import { Link } from "react-router-dom";
 import { useApp } from "../context/AppContext";
+import {
+  Play,
+  Coffee,
+  CheckCircle2,
+  BarChart3,
+  ClipboardList,
+  Rocket
+} from "lucide-react";
 
 const FEATURES = [
   {
@@ -78,18 +86,18 @@ export default function Home() {
             dudukmu, memprediksi risiko, dan mendorongmu untuk hidup lebih
             aktif.
           </p>
-          <div className="flex gap-2 flex-wrap justify-center md:justify-start">
+          <div className="flex gap-2 justify-center md:justify-start">
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-[0.95rem] font-semibold transition-all bg-primary text-white shadow-[0_4px_14px_rgba(15,118,110,0.4)] hover:bg-primary-dark hover:-translate-y-px border-none"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-[13px] lg:text-[15px] font-semibold transition-all bg-primary text-white shadow-[0_4px_14px_rgba(15,118,110,0.4)] hover:bg-primary-dark hover:-translate-y-px border-none"
             >
-              🚀 Mulai Sekarang
+              <Rocket size={15} /> Mulai Sekarang
             </Link>
             <Link
               to="/history"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-[0.95rem] font-semibold transition-all bg-bg-2 text-primary border-2 border-primary-light hover:bg-primary-light hover:text-white cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-[13px] lg:text-[15px] font-semibold transition-all bg-bg-2 text-primary border-2 border-primary-light hover:bg-primary-light hover:text-white cursor-pointer"
             >
-              📋 Lihat Riwayat
+              <ClipboardList size={15} /> Lihat Riwayat
             </Link>
           </div>
         </div>
@@ -167,45 +175,52 @@ export default function Home() {
         <h2 className="text-[clamp(1.5rem,3vw,2rem)] font-bold text-text mb-8 text-center font-heading">
           Cara Kerja
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 relative">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 relative">
           <div className="absolute top-7 left-[12.5%] w-3/4 h-0.5 bg-gradient-to-r from-primary-light to-bg-2 hidden md:block" />
+
           {[
             {
               step: "01",
-              icon: "▶",
+              icon: Play,
               text: 'Klik "Mulai Duduk" saat mulai bekerja',
             },
             {
               step: "02",
-              icon: "☕",
+              icon: Coffee,
               text: "Ambil jeda ketika notifikasi muncul",
             },
             {
               step: "03",
-              icon: "⏹",
+              icon: CheckCircle2,
               text: 'Klik "Selesai" untuk menyimpan sesi',
             },
             {
               step: "04",
-              icon: "📊",
+              icon: BarChart3,
               text: "Cek dashboard & prediksi risiko AI",
             },
-          ].map((s) => (
-            <div
-              key={s.step}
-              className="flex flex-col items-center text-center gap-2 relative"
-            >
-              <div className="font-heading text-[0.7rem] font-bold tracking-wider text-primary bg-bg-2 px-[0.6rem] py-1 rounded-full">
-                {s.step}
+          ].map((s) => {
+            const Icon = s.icon;
+
+            return (
+              <div
+                key={s.step}
+                className="flex flex-col items-center text-center gap-2 relative"
+              >
+                <div className="font-heading text-[0.7rem] font-bold tracking-wider text-primary bg-bg-2 px-[0.6rem] py-1 rounded-full">
+                  {s.step}
+                </div>
+
+                <div className="w-[52px] h-[52px] bg-primary text-white rounded-full flex items-center justify-center shadow-[0_4px_14px_rgba(15,118,110,0.35)]">
+                  <Icon size={24} strokeWidth={2.2} />
+                </div>
+
+                <p className="text-[0.84rem] text-text-secondary max-w-[140px]">
+                  {s.text}
+                </p>
               </div>
-              <div className="w-[52px] h-[52px] bg-primary text-white rounded-full flex items-center justify-center text-[1.3rem] shadow-[0_4px_14px_rgba(15,118,110,0.35)]">
-                {s.icon}
-              </div>
-              <p className="text-[0.84rem] text-text-secondary max-w-[140px]">
-                {s.text}
-              </p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

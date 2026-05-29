@@ -42,13 +42,12 @@ export default function Register() {
   return (
     <main className="min-h-[calc(100vh-70px)] flex items-center justify-center p-8 px-6 bg-[radial-gradient(ellipse_at_60%_0%,#CCFBF1_0%,var(--color-bg)_60%)]">
       <div className="bg-white rounded-lg shadow-md border border-border w-full max-w-[440px] flex flex-col gap-4 p-12 animate-fade-in">
-        <div className="flex items-center gap-2 font-heading text-[1.1rem] font-bold text-primary mb-2">
-          <span className="text-[1.4rem]">🧍</span>
+        <div className="flex flex-col items-center gap-2 font-heading text-[1.1rem] font-bold text-primary mb-2">
           <span className="">HealthPosture</span>
+          <h1 className="text-xl lg:text-2xl font-extrabold text-text -mt-2 font-heading">Buat akun baru</h1>
+          <p className="text-sm lg:text-md text-center text-text-secondary -mt-2">Mulai perjalanan postur sehatmu hari ini</p>
         </div>
 
-        <h1 className="text-[1.6rem] font-extrabold text-text -mt-2 font-heading">Buat akun baru</h1>
-        <p className="text-[0.88rem] text-text-secondary -mt-2">Mulai perjalanan postur sehatmu hari ini</p>
 
         {error && <div className="bg-red-100 border border-red-200 rounded-md text-danger text-[0.875rem] px-4 py-[0.65rem] animate-fade-in">{error}</div>}
 
@@ -135,7 +134,10 @@ export default function Register() {
 
         <p className="text-center text-[0.875rem] text-text-secondary pt-2 border-t border-border">
           Sudah punya akun?{' '}
-          <Link to="/login" className="text-primary font-semibold underline underline-offset-2 hover:text-primary-dark">Masuk</Link>
+          <Link to="/login">
+            <span className='text-primary font-semibold underline underline-offset-2 hover:text-primary-dark'>Masuk</span>
+
+          </Link>
         </p>
       </div>
     </main>
