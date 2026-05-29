@@ -71,9 +71,12 @@ class SessionsHandler {
     }
 
     async deleteSessionsHandler(req, res) {
+        const { id: credentialId } = req.auth.credentials;
+        await this._service.deleteAllSessionsByUserId(credentialId);
+
         return res.json({
             status: 'success',
-            message: 'Belum diimplementasikan',
+            message: 'Riwayat sesi berhasil dihapus',
         });
     }
 }
