@@ -11,6 +11,9 @@ yarn-error.log*
 # env
 .env
 
+# venv
+venv/
+
 # build
 dist/
 build/
