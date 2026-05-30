@@ -42,11 +42,9 @@ Sebelum menginstal, pastikan persyaratan berikut sudah terpenuhi:
 ### Langkah 1: Clone Repository
 
 ```bash
-git clone https://github.com/USERNAME/healthy-posture-ai.git
+git clone https://github.com/kevinRYOJ/healthy-posture-ai.git
 cd healthy-posture-ai
 ```
-
-> Ganti `USERNAME` dengan username GitHub pemilik repo.
 
 ---
 
@@ -120,6 +118,8 @@ cd ..
 
 # Buat virtual environment
 python3 -m venv venv  # (Di macOS/Linux gunakan python3)
+
+python -m venv venv #(Di Windows)
 
 # Aktivasi virtual environment:
 # Windows (PowerShell):
@@ -202,6 +202,7 @@ Setiap pengguna memulai dengan **Health Score 100**. Skor akan disesuaikan berda
 Ketika pengguna menyalakan **Timer Duduk**, Backend secara berkala mengirimkan konteks aktivitas pengguna (durasi duduk, frekuensi istirahat, profil pekerjaan, usia, dll) kepada model Gemini.
 
 Hasil prediksi AI akan dievaluasi dan diklasifikasikan sebagai:
+
 - **Risiko Rendah**: Skor +5 (recovery bagus)
 - **Risiko Sedang**: Skor -10 poin
 - **Risiko Tinggi**: Skor -25 poin (alarm berbunyi terus sampai user istirahat!)
@@ -217,6 +218,7 @@ Selain itu, Gemini juga akan mengembalikan **Insight** berupa motivasi satu para
 **Penyebab**: PostgreSQL belum berjalan atau database belum dibuat.
 
 **Solusi**:
+
 1. Pastikan service PostgreSQL sudah running:
    - **Windows**: Buka _Services_ (Win+R → `services.msc`) → cari `postgresql` → pastikan statusnya _Running_
    - **macOS**: Buka terminal dan ketik `brew services start postgresql` atau `brew services start postgresql@14`
@@ -225,7 +227,7 @@ Selain itu, Gemini juga akan mengembalikan **Insight** berupa motivasi satu para
 
 ### ❌ Error: API Key Gemini tidak ditemukan atau Invalid Response
 
-**Penyebab**: Variabel `GEMINI_API_KEY` tidak disetel di `.env` atau *key* yang diberikan tidak valid.
+**Penyebab**: Variabel `GEMINI_API_KEY` tidak disetel di `.env` atau _key_ yang diberikan tidak valid.
 
 **Solusi**:
 Pastikan kamu telah membuat file `.env` di folder `server/` dan mengisi `GEMINI_API_KEY` dengan kunci API yang valid. Kunci API bisa didapatkan secara gratis dari Google AI Studio.
