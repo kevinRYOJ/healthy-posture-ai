@@ -1,5 +1,4 @@
 const bcrypt = require('bcryptjs');
-const AuthenticationsValidator = require('../../validations/authentications');
 const TokenManager = require('../../utils/tokenManager');
 
 class AuthenticationsHandler {
@@ -18,13 +17,6 @@ class AuthenticationsHandler {
                     req.body
                 );
             const { email, password } = req.body;
-
-            if (!email || !password) {
-                return res.status(400).json({
-                    status: 'fail',
-                    message: 'Email dan password wajib diisi',
-                });
-            }
 
             // cek user
             const user =
@@ -69,8 +61,13 @@ class AuthenticationsHandler {
             });
 
         } catch (error) {
+            if (error.message && error.message.includes('"')) {
+                return res.status(400).json({
+                    status: 'fail',
+                    message: error.message,
+                });
+            }
             console.error(error);
-
             return res.status(500).json({
                 status: 'error',
                 message: 'Internal server error',

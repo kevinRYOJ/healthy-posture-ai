@@ -5,7 +5,7 @@ const auth = (req, res, next) => {
         const authHeader =
             req.headers.authorization;
 
-        if (!authHeader) {
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return res.status(401).json({
                 status: 'fail',
                 message: 'Unauthorized',
@@ -14,6 +14,13 @@ const auth = (req, res, next) => {
 
         const token =
             authHeader.split(' ')[1];
+
+        if (!token) {
+            return res.status(401).json({
+                status: 'fail',
+                message: 'Unauthorized',
+            });
+        }
 
         const decoded = jwt.verify(
             token,
