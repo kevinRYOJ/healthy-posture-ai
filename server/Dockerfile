@@ -12,6 +12,6 @@ COPY . .
 
 RUN pip3 install --break-system-packages flask flask-cors requests
 
-EXPOSE 5000
+EXPOSE 5000 5001
 
 CMD ["npm", "start"]

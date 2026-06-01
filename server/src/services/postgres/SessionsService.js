@@ -64,6 +64,14 @@ class SessionsService {
 
         return result.rows[0];
     }
+
+    async deleteAllSessionsByUserId(userId) {
+        const query = {
+            text: 'DELETE FROM sitting_sessions WHERE user_id = $1',
+            values: [userId],
+        };
+        await this._pool.query(query);
+    }
 }
 
 module.exports = SessionsService;

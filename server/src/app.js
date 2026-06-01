@@ -1,5 +1,9 @@
 const express = require('express');
 const cors = require('cors');
+const { spawn } = require('child_process');
+const http = require('http');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 
@@ -9,7 +13,7 @@ const auth = require('./middlewares/auth');
 const sessions = require('./api/sessions');
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
     credentials: true,
 }));
 app.use(express.json());
@@ -35,10 +39,12 @@ app.use('/api/auth/register', users());
 app.use('/api/auth/login', authentications());
 
 // Profile
+const UsersService = require('./services/postgres/UsersService');
+const usersService = new UsersService();
+
 app.get('/api/auth/me', auth, async (req, res) => {
     try {
-        const UsersService = require('./services/postgres/UsersService');
-        const usersService = new UsersService();
+
         const user = await usersService.getUserById(req.user.id);
 
         if (!user) {
@@ -62,8 +68,7 @@ app.get('/api/auth/me', auth, async (req, res) => {
 });
 
 app.put('/api/auth/profile', auth, async (req, res) => {
-    const UsersService = require('./services/postgres/UsersService');
-    const usersService = new UsersService();
+
     try {
         const { age, bmi, sleep_hours, gender, work_type, fitness_level, device_preference } = req.body;
         await usersService.updatePersonalization(req.user.id, {
@@ -77,10 +82,7 @@ app.put('/api/auth/profile', auth, async (req, res) => {
 });
 
 app.use('/api/sessions', sessions());
-const { spawn } = require('child_process');
-const http = require('http');
-const path = require('path');
-const fs = require('fs');
+
 
 // ══════════════════════════════════════════════════════════════
 // Machine Learning Predict via Persistent Python Worker
@@ -95,8 +97,9 @@ try {
     console.error('Failed to load ML Metadata:', err.message);
 }
 
-// const pythonPath = path.join(__dirname, '../../venv/Scripts/python.exe'); #untuk Windows dengan virtualenv
-const pythonPath = process.env.PYTHON_PATH || 'python3'; //di gunakan untuk Docker dan Linux/MacOS, pastikan python3 ada di PATH atau set PYTHON_PATH
+// Auto-detect: venv di Windows → PYTHON_PATH env → python3 (Docker/Linux)
+const venvPython = path.join(__dirname, '../../venv/Scripts/python.exe');
+const pythonPath = fs.existsSync(venvPython) ? venvPython : (process.env.PYTHON_PATH || 'python3');
 const scriptPath = path.join(__dirname, '../model_server.py');
 
 const pythonProcess = spawn(pythonPath, [scriptPath], {
@@ -115,8 +118,7 @@ app.post('/predict', auth, async (req, res) => {
     try {
         if (!mlMetadata) return res.status(500).json({ status: 'error', message: 'Model metadata is not ready' });
 
-        const UsersService = require('./services/postgres/UsersService');
-        const usersService = new UsersService();
+
         const user = await usersService.getUserById(req.user.id);
         if (!user.has_personalized) return res.status(400).json({ status: 'fail', message: 'Please complete personalization first' });
 
@@ -172,6 +174,13 @@ app.post('/predict', auth, async (req, res) => {
         console.error('Prediction error:', err);
         return res.status(500).json({ status: 'error', message: 'Internal server error during prediction' });
     }
+});
+
+
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('Unhandled error:', err);
+    res.status(500).json({ status: 'error', message: 'Internal server error' });
 });
 
 module.exports = app;

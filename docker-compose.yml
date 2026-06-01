@@ -5,7 +5,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 4321
+      POSTGRES_PASSWORD: admin
       POSTGRES_DB: healthy_posture_ai
     ports:
       - "5432:5432"
@@ -19,7 +19,15 @@ services:
     depends_on:
       - postgres
     environment:
-      DATABASE_URL: postgres://postgres:4321@postgres:5432/healthy_posture_ai
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: admin
+      PGDATABASE: healthy_posture_ai
+      JWT_SECRET: healthposture_secret
+      GEMINI_API_KEY: AIzaSyD-oaR81IeBjGQW1SoGEpZrV7O-YANBzB4
+      PYTHON_PATH: python3
+      CORS_ORIGIN: http://localhost:3000
 
   frontend:
     build: ./client
