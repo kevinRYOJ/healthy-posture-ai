@@ -70,7 +70,7 @@ app.put('/api/auth/profile', auth, async (req, res) => {
             age, bmi, sleep_hours, gender, work_type, fitness_level, device_preference
         });
         return res.status(200).json({ status: 'success', message: 'Profil berhasil diperbarui' });
-    } catch(err) {
+    } catch (err) {
         console.error(err);
         return res.status(500).json({ status: 'error', message: 'Internal server error' });
     }
@@ -95,7 +95,8 @@ try {
     console.error('Failed to load ML Metadata:', err.message);
 }
 
-const pythonPath = path.join(__dirname, '../../venv/Scripts/python.exe');
+// const pythonPath = path.join(__dirname, '../../venv/Scripts/python.exe'); #untuk Windows dengan virtualenv
+const pythonPath = process.env.PYTHON_PATH || 'python3'; //di gunakan untuk Docker dan Linux/MacOS, pastikan python3 ada di PATH atau set PYTHON_PATH
 const scriptPath = path.join(__dirname, '../model_server.py');
 
 const pythonProcess = spawn(pythonPath, [scriptPath], {
@@ -113,7 +114,7 @@ process.on('SIGTERM', () => { pythonProcess.kill(); process.exit(); });
 app.post('/predict', auth, async (req, res) => {
     try {
         if (!mlMetadata) return res.status(500).json({ status: 'error', message: 'Model metadata is not ready' });
-        
+
         const UsersService = require('./services/postgres/UsersService');
         const usersService = new UsersService();
         const user = await usersService.getUserById(req.user.id);
@@ -156,7 +157,7 @@ app.post('/predict', auth, async (req, res) => {
                     const riskLevel = mlMetadata.target[result.max_idx];
                     console.log(`🤖 Predict: ${riskLevel} (${(result.confidence * 100).toFixed(1)}%) | sitting=${total_sitting}min`);
                     res.json({ status: 'success', data: { risk_level: riskLevel, confidence: result.confidence, insight: result.insight } });
-                } catch(e) { res.status(500).json({ status: 'error', message: 'Invalid response from Python model' }); }
+                } catch (e) { res.status(500).json({ status: 'error', message: 'Invalid response from Python model' }); }
             });
         });
 
@@ -167,7 +168,7 @@ app.post('/predict', auth, async (req, res) => {
         pyReq.write(payload);
         pyReq.end();
 
-    } catch(err) {
+    } catch (err) {
         console.error('Prediction error:', err);
         return res.status(500).json({ status: 'error', message: 'Internal server error during prediction' });
     }

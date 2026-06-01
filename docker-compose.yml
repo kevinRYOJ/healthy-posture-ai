@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:14
+    container_name: healthy-posture-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 4321
+      POSTGRES_DB: healthy_posture_ai
+    ports:
+      - "5432:5432"
+
+  backend:
+    build: ./server
+    container_name: healthy-posture-api
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://postgres:4321@postgres:5432/healthy_posture_ai
+
+  frontend:
+    build: ./client
+    container_name: healthy-posture-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
