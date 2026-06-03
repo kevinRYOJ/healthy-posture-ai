@@ -12,17 +12,21 @@ const authentications = require('./api/authentications');
 const auth = require('./middlewares/auth');
 const sessions = require('./api/sessions');
 
-const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:3000')
-    .split(',')
-    .map(o => o.trim());
+const allowedOrigins = [
+    'http://localhost:3000',
+    'https://healthy-posture-ai-chi.vercel.app',
+    ...(process.env.CORS_ORIGIN || '').split(',').map(o => o.trim()).filter(Boolean),
+];
+
+console.log('Allowed CORS origins:', allowedOrigins);
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Allow requests with no origin (mobile apps, curl, etc.)
         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
         } else {
-            callback(new Error('Not allowed by CORS'));
+            console.warn('CORS blocked origin:', origin);
+            callback(null, false);
         }
     },
     credentials: true,
