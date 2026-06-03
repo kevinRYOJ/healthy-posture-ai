@@ -11,7 +11,7 @@ const RISK_INFO = {
     emoji: '⚠️', label: 'Sedang', color: '#A16207', bg: '#FEF9C3', border: '#FDE047',
     desc: 'Perhatikan durasi dudukmu. Pastikan mengambil jeda setiap 45 menit.',
   },
-  Tinggi: {
+  High: {
     emoji: '🔴', label: 'Tinggi', color: '#DC2626', bg: '#FEE2E2', border: '#FCA5A5',
     desc: 'Risiko postur buruk tinggi! Segera istirahat dan lakukan peregangan.',
   },
@@ -20,7 +20,7 @@ const RISK_INFO = {
 const TIPS = {
   Low: ['Lakukan peregangan ringan tiap jam', 'Pastikan monitor sejajar mata', 'Minum air setiap 30 menit'],
   Medium: ['Istirahat 5 menit tiap 45 menit', 'Cek posisi punggung & leher', 'Pertimbangkan standing desk'],
-  Tinggi: ['Istirahat SEKARANG minimal 15 menit', 'Lakukan peregangan punggung & leher', 'Batasi duduk max 1 jam tanpa jeda'],
+  High: ['Istirahat SEKARANG minimal 15 menit', 'Lakukan peregangan punggung & leher', 'Batasi duduk max 1 jam tanpa jeda'],
 };
 
 export default function RiskCard() {
