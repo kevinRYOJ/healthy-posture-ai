@@ -1,12 +1,12 @@
 # Healthy Posture AI
 
-Healthy Posture AI adalah aplikasi web cerdas yang membantu pengguna menjaga postur tubuh yang sehat dan mengurangi risiko bahaya akibat duduk terlalu lama. Aplikasi ini memadukan logika sistem pakar dan **Google Gemini API** untuk memprediksi tingkat risiko kesehatan secara *real-time* berdasarkan durasi duduk, kebiasaan istirahat, dan data personalisasi pengguna (usia, BMI, dll).
+Healthy Posture AI adalah aplikasi web cerdas yang membantu pengguna menjaga postur tubuh yang sehat dan mengurangi risiko bahaya akibat duduk terlalu lama. Aplikasi ini memadukan logika sistem pakar dan **Google Gemini API** untuk memprediksi tingkat risiko kesehatan secara _real-time_ berdasarkan durasi duduk, kebiasaan istirahat, dan data personalisasi pengguna (usia, BMI, dll).
 
 ---
 
 ## 🏗️ Arsitektur Teknologi
 
-Sistem ini dibangun dengan arsitektur **Microservices Sederhana** yang memisahkan antara logika aplikasi (Node.js) dengan komputasi *Machine Learning* (Python).
+Sistem ini dibangun dengan arsitektur **Microservices Sederhana** yang memisahkan antara logika aplikasi (Node.js) dengan komputasi _Machine Learning_ (Python).
 
 1. **Frontend (Klien)** — React.js, Vite, TailwindCSS
    - Antarmuka pengguna (Dashboard, Timer Duduk, Profil, Riwayat Sesi)
@@ -27,6 +27,7 @@ Sistem ini dibangun dengan arsitektur **Microservices Sederhana** yang memisahka
 Kamu bisa menjalankan aplikasi ini menggunakan **Docker** (paling mudah) atau secara **Manual** (jika ingin mengubah kode).
 
 Pastikan kamu sudah clone repository ini:
+
 ```bash
 git clone https://github.com/kevinRYOJ/healthy-posture-ai.git
 cd healthy-posture-ai
@@ -43,9 +44,20 @@ Ini adalah cara tercepat tanpa perlu menginstal Node.js, Python, atau PostgreSQL
 1. Buka file `.env.example` di folder `server/`, lalu _copy_ isinya menjadi file baru bernama `.env`.
 2. Buka file `docker-compose.yml` di _root folder_ proyek.
 3. Jalankan perintah berikut di terminal:
+
    ```bash
    docker-compose up -d --build
+
+   kemudian masuk ke container backednya, dan jalankan
+
+   #zsh
+   docker exec -it healthy-posture-api bash
+
+   jalankan migrasinya
+   bash
+      npm run migrate:up
    ```
+
 4. Selesai! Aplikasi akan langsung berjalan:
    - Frontend: **http://localhost:3000**
    - Backend API: **http://localhost:5000**
@@ -56,11 +68,13 @@ Ini adalah cara tercepat tanpa perlu menginstal Node.js, Python, atau PostgreSQL
 ### METODE B: Instalasi Manual (Untuk Development) 🛠️
 
 **Persyaratan Sistem (Semua OS):**
+
 - **Node.js** v20+
 - **Python** v3.10 – v3.13 (Pastikan di-Add to PATH)
 - **PostgreSQL** v14+
 
 #### Langkah 1: Siapkan Database PostgreSQL
+
 1. Buka PostgreSQL (via `psql` atau pgAdmin) lalu jalankan query:
    ```sql
    CREATE DATABASE healthy_posture_ai;
@@ -77,10 +91,12 @@ Ini adalah cara tercepat tanpa perlu menginstal Node.js, Python, atau PostgreSQL
    GEMINI_API_KEY=api_key_gemini_kamu
    CORS_ORIGIN=http://localhost:3000
    ```
-   *(Ganti password PG dan API Key Gemini milikmu)*
+   _(Ganti password PG dan API Key Gemini milikmu)_
 
 #### Langkah 2: Migrasi Database
+
 Buka terminal dan jalankan:
+
 ```bash
 cd server
 npm install
@@ -88,9 +104,11 @@ npm run migrate:up
 ```
 
 #### Langkah 3: Siapkan Python Virtual Environment (ML Server)
+
 Buka terminal baru di _root folder_ proyek (`healthy-posture-ai/`):
 
 **Untuk Windows:**
+
 ```powershell
 python -m venv venv
 .\venv\Scripts\activate
@@ -98,6 +116,7 @@ pip install flask flask-cors requests
 ```
 
 **Untuk macOS / Linux:**
+
 ```bash
 python3 -m venv venv
 source venv/bin/activate
@@ -105,20 +124,26 @@ pip install flask flask-cors requests
 ```
 
 #### Langkah 4: Jalankan Backend & ML Server
+
 Backend sudah dikonfigurasi untuk menjalankan server Python secara otomatis.
+
 ```bash
 cd server
 npm run dev
 ```
-*(Jangan tutup terminal ini. Akan ada log port 5000 dan log Python port 5001)*
+
+_(Jangan tutup terminal ini. Akan ada log port 5000 dan log Python port 5001)_
 
 #### Langkah 5: Jalankan Frontend
+
 Buka terminal baru lagi:
+
 ```bash
 cd client
 npm install
 npm run dev
 ```
+
 Buka browser dan akses **http://localhost:3000**! 🎉
 
 ---
@@ -138,6 +163,7 @@ Buka browser dan akses **http://localhost:3000**! 🎉
 ---
 
 ## 📁 Struktur Folder Utama
+
 ```
 healthy-posture-ai/
 ├── client/                  # Frontend (React + Vite + Tailwind)
