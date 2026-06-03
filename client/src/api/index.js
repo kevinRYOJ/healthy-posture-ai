@@ -1,6 +1,6 @@
 // API — semua network call ke backend Express
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = import.meta.env.VITE_API_URL;
 const BASE_AUTH = `${BASE_URL}/api/auth`;
 const BASE_PREDICT = `${BASE_URL}/predict`;
 const BASE_SESSIONS = `${BASE_URL}/api/sessions`;

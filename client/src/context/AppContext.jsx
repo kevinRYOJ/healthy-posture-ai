@@ -79,7 +79,7 @@ export function AppProvider({ children }) {
   const timer = useTimer();
 
   // Gabungkan skor sesi dari API + prediksi AI lokal
-  const riskModifier = riskLevel === 'Tinggi' ? -25 : riskLevel === 'Medium' ? -10 : riskLevel === 'Low' ? 5 : 0;
+  const riskModifier = riskLevel === 'High' ? -25 : riskLevel === 'Medium' ? -10 : riskLevel === 'Low' ? 5 : 0;
   const healthScore = Math.max(0, Math.min(100, baseHealthScore + riskModifier));
   const totalSittingToday = calcTodaySitting(sessions);
 
@@ -126,7 +126,7 @@ export function AppProvider({ children }) {
 
   // Hentikan alarm jika user melakukan action (jeda/selesai)
   useEffect(() => {
-    if (timer.status !== 'SITTING' || riskLevel !== 'Tinggi') {
+    if (timer.status !== 'SITTING' || riskLevel !== 'High') {
       // Jika status bukan SITTING, atau misalnya ingin mematikan alarm
       // Kita asumsikan kapanpun status bukan SITTING, matikan bunyi.
       if (timer.status !== 'SITTING') {
@@ -142,7 +142,7 @@ export function AppProvider({ children }) {
   const previousRisk = useRef(null);
 
   useEffect(() => {
-    if (riskLevel === 'Tinggi' && previousRisk.current !== 'Tinggi') {
+    if (riskLevel === 'High' && previousRisk.current !== 'High') {
       if (!alarmAudioRef.current && timer.status === 'SITTING') {
         alarmAudioRef.current = new Audio('/alert.wav');
         alarmAudioRef.current.loop = true;

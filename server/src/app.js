@@ -116,13 +116,10 @@ process.on('SIGTERM', () => { pythonProcess.kill(); process.exit(); });
 
 app.post('/predict', auth, async (req, res) => {
     try {
-        if (!mlMetadata) return res.status(500).json({ status: 'error', message: 'Model metadata is not ready' });
-
-
         const user = await usersService.getUserById(req.user.id);
         if (!user.has_personalized) return res.status(400).json({ status: 'fail', message: 'Please complete personalization first' });
 
-        let { total_sitting = 0, number_of_breaks = 0, avg_break_duration = 0, longest_sitting_streak = 0, fatigue_level = 3, day_of_week, time_of_day } = req.body;
+        let { total_sitting = 0, number_of_breaks = 0, avg_break_duration = 0, longest_sitting_streak = 0, fatigue_level = 0, day_of_week, time_of_day } = req.body;
         if (!longest_sitting_streak) longest_sitting_streak = total_sitting;
 
         const now = new Date();
@@ -131,15 +128,24 @@ app.post('/predict', auth, async (req, res) => {
         const hour = now.getHours();
         const actualTime = time_of_day || (hour < 12 ? 'Morning' : hour < 17 ? 'Afternoon' : hour < 21 ? 'Evening' : 'Night');
 
-        const FEATURE_ORDER = ['total_sitting_minutes', 'number_of_breaks', 'avg_break_duration_minutes', 'longest_sitting_streak_minutes', 'fatigue_level', 'age', 'daily_work_hours', 'bmi', 'sleep_hours', 'gender', 'work_type', 'fitness_level', 'day_of_week', 'time_of_day_dominant', 'device_preference'];
-        const encode = (col, val) => { const arr = mlMetadata.labels[col] || []; const idx = arr.indexOf(val); return idx === -1 ? 0 : idx; };
-
-        const inputValues = {
-            total_sitting_minutes: total_sitting, number_of_breaks, avg_break_duration_minutes: avg_break_duration, longest_sitting_streak_minutes: longest_sitting_streak, fatigue_level, age: user.age || 25, daily_work_hours: 8, bmi: parseFloat(user.bmi) || 22, sleep_hours: parseFloat(user.sleep_hours) || 7, gender: encode('gender', user.gender), work_type: encode('work_type', user.work_type), fitness_level: encode('fitness_level', user.fitness_level), day_of_week: encode('day_of_week', actualDay), time_of_day_dominant: encode('time_of_day_dominant', actualTime), device_preference: encode('device_preference', user.device_preference || 'Laptop')
+        // Data input mentah — Python yang akan encode & scale menggunakan pkl asli
+        const inputData = {
+            total_sitting_minutes: total_sitting,
+            number_of_breaks,
+            avg_break_duration_minutes: avg_break_duration,
+            longest_sitting_streak_minutes: longest_sitting_streak,
+            fatigue_level,
+            age: user.age || 25,
+            daily_work_hours: 8,
+            bmi: parseFloat(user.bmi) || 22,
+            sleep_hours: parseFloat(user.sleep_hours) || 7,
+            gender: user.gender || 'Male',
+            work_type: user.work_type || 'Office',
+            fitness_level: user.fitness_level || 'Medium',
+            day_of_week: actualDay,
+            time_of_day_dominant: actualTime,
+            device_preference: user.device_preference || 'Laptop'
         };
-
-        const rawArray = FEATURE_ORDER.map(col => { const val = inputValues[col]; return (val !== undefined && val !== null && !isNaN(val)) ? val : 0; });
-        const scaledArray = rawArray.map((val, i) => (val - (mlMetadata.scaler.mean[i] || 0)) / (mlMetadata.scaler.scale[i] || 1));
 
         const contextData = {
             name: user.name || 'User',
@@ -149,16 +155,15 @@ app.post('/predict', auth, async (req, res) => {
             number_of_breaks: number_of_breaks
         };
 
-        const payload = JSON.stringify({ features: scaledArray, context: contextData });
+        const payload = JSON.stringify({ input: inputData, context: contextData });
         const pyReq = http.request({ hostname: '127.0.0.1', port: 5001, path: '/predict', method: 'POST', headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(payload) } }, (pyRes) => {
             let data = ''; pyRes.on('data', (chunk) => data += chunk);
             pyRes.on('end', () => {
                 try {
                     const result = JSON.parse(data);
                     if (result.error) throw new Error(result.error);
-                    const riskLevel = mlMetadata.target[result.max_idx];
-                    console.log(`🤖 Predict: ${riskLevel} (${(result.confidence * 100).toFixed(1)}%) | sitting=${total_sitting}min`);
-                    res.json({ status: 'success', data: { risk_level: riskLevel, confidence: result.confidence, insight: result.insight } });
+                    console.log(`🤖 Predict: ${result.pred_label} (${(result.confidence * 100).toFixed(1)}%) | sitting=${total_sitting}min`);
+                    res.json({ status: 'success', data: { risk_level: result.pred_label, confidence: result.confidence, insight: result.insight } });
                 } catch (e) { res.status(500).json({ status: 'error', message: 'Invalid response from Python model' }); }
             });
         });
