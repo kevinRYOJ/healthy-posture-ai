@@ -14,7 +14,8 @@ const sessions = require('./api/sessions');
 
 const allowedOrigins = [
     'http://localhost:3000',
-    'https://www.healthy-posture.my.id/',
+    'https://www.healthy-posture.my.id',
+    'https://healthy-posture.my.id',
     ...(process.env.CORS_ORIGIN || '').split(',').map(o => o.trim()).filter(Boolean),
 ];
 
