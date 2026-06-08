@@ -14,7 +14,7 @@ const sessions = require('./api/sessions');
 
 const allowedOrigins = [
     'http://localhost:3000',
-    'https://healthy-posture-ai-chi.vercel.app',
+    'https://www.healthy-posture.my.id/',
     ...(process.env.CORS_ORIGIN || '').split(',').map(o => o.trim()).filter(Boolean),
 ];
 

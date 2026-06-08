@@ -8,11 +8,11 @@ export default defineConfig({
     port: 3000,
     proxy: {
       '/api': {
-        target: 'https://healthy-posture-ai.vercel.app',
+        target: 'https://www.healthy-posture.my.id/',
         changeOrigin: true,
       },
       '/predict': {
-        target: 'https://healthy-posture-ai.vercel.app',
+        target: 'https://www.healthy-posture.my.id/',
         changeOrigin: true,
       },
     },
